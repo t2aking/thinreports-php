@@ -16,10 +16,10 @@ class TestGraphicsItem extends AbstractItem
     // make public for testing
     public $style;
 
-    public function __construct(Page $parent, array $format)
+    public function __construct(Page $parent, array $schema)
     {
-        parent::__construct($parent, $format);
-        $this->style = new GraphicStyle($format);
+        parent::__construct($parent, $schema);
+        $this->style = new GraphicStyle($schema);
     }
 
     public function getBounds() {}
@@ -75,13 +75,13 @@ class AbstractItemTest extends TestCase
         $item = new TestGraphicsItem($this->page, $this->dataItemFormat('rect'));
 
         $item->setStyle('fill_color', 'red');
-        $this->assertEquals('red', $item->getStyle('fill_color'));
+        $this->assertEquals('red', $item->style->get_fill_color());
     }
 
     function test_getStyle()
     {
         $item = new TestGraphicsItem($this->page, $this->dataItemFormat('rect'));
-        $this->assertEquals('#ffffff', $item->style->get_fill_color());
+        $this->assertEquals('#ffffff', $item->getStyle('fill_color'));
     }
 
     function test_setStyles()
@@ -107,6 +107,15 @@ class AbstractItemTest extends TestCase
         $this->assertSame($this->page, $item->getParent());
     }
 
+    function test_getIsDynamic()
+    {
+        $item = new TestItem($this->page, array('id' => '', 'display' => true));
+        $this->assertFalse($item->isDynamic());
+
+        $item = new TestItem($this->page, array('id' => 'foo', 'display' => true));
+        $this->assertTrue($item->isDynamic());
+    }
+
     function test_getSchema()
     {
         $schema = array('display' => true);
@@ -127,7 +136,7 @@ class AbstractItemTest extends TestCase
     function test_isTypeOf()
     {
         $item = new TestItem($this->page, array(
-            'display' => 'true',
+            'display' => true,
             'type' => 'foo_type'
         ));
         $this->assertTrue($item->isTypeOf('foo_type'));

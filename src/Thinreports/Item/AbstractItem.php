@@ -17,6 +17,7 @@ abstract class AbstractItem
     protected $schema;
 
     protected $is_visible;
+    protected $is_dynamic;
     protected $style;
 
     /**
@@ -28,6 +29,7 @@ abstract class AbstractItem
         $this->parent = $parent;
         $this->schema = $schema;
         $this->is_visible = $schema['display'] === true;
+        $this->is_dynamic = $schema['id'] !== '';
     }
 
     /**
@@ -72,6 +74,14 @@ abstract class AbstractItem
     public function getId()
     {
         return $this->schema['id'];
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isDynamic()
+    {
+        return $this->is_dynamic;
     }
 
     /**
