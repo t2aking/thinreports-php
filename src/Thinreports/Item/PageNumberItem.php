@@ -26,7 +26,7 @@ class PageNumberItem extends AbstractItem
         parent::__construct($parent, $schema);
 
         $this->is_dynamic = true;
-        $this->style = new TextStyle($schema);
+        $this->style = new TextStyle($schema['style']);
         $this->number_format = $this->schema['format'];
     }
 

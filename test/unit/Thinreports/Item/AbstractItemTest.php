@@ -82,6 +82,7 @@ class AbstractItemTest extends TestCase
     {
         $item = new TestGraphicsItem($this->page, $this->dataItemFormat('rect'));
         $this->assertEquals('#ffffff', $item->getStyle('fill_color'));
+        $this->assertEquals('1', $item->getStyle('border_width'));
     }
 
     function test_setStyles()

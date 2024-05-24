@@ -10,9 +10,9 @@ default: &default
   border-radius: 0
   style:
     border-width: 1
-    border-color: #000000
+    border-color: "#000000"
     border-style: solid
-    fill-color: #ffffff
+    fill-color: "#ffffff"
 
 hidden:
   <<: *default
