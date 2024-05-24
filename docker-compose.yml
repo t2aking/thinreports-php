@@ -1,0 +1,6 @@
+services:
+  php:
+    container_name: php
+    build: ./docker/php
+    volumes:
+      - .:/var/www/html
