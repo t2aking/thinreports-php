@@ -89,7 +89,7 @@ class Page extends BlankPage
      */
     public function hasItem($id)
     {
-        return $this->layout->hasItem($id);
+        return $this->layout->hasItemById($id);
     }
 
     /**
@@ -97,7 +97,7 @@ class Page extends BlankPage
      */
     public function getItemIds()
     {
-        return array_keys($this->layout->getItemFormats());
+        return array_keys($this->layout->getItemSchemas());
     }
 
     /**
