@@ -59,7 +59,7 @@ class Text
      *      @option string[] "font_style" required
      *      @option float|string "font_size" required
      *      @option string "color" required
-     *      @option string "overflow" optional default is "trunecate"
+     *      @option string "overflow" optional default is "truncate"
      *      @option boolean "single_row" optional default is false
      *      @option string "align" optional default is "left"
      *      @option string "valign" optional default is "top"
