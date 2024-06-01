@@ -154,7 +154,6 @@ class ItemRenderer extends AbstractRenderer
      */
     public function renderPageNumberItem(Item\PageNumberItem $item)
     {
-        $format = $item->getFormat();
         $bounds = $item->getBounds();
 
         $this->doc->text->drawText(
@@ -260,12 +259,12 @@ class ItemRenderer extends AbstractRenderer
      */
     public function buildImageBoxItemStyles(Item\ImageBlockItem $item)
     {
-        $format = $item->getFormat();
+        $schema = $item->getSchema();
 
-        $align  = $format['position-x'] ?: 'left';
-        $valign = $format['position-y'] ?: 'top';
+        $align  = $schema['style']['position-x'] ?: 'left';
+        $valign = $schema['style']['position-y'] ?: 'top';
 
-        if ($format['position-y'] === 'center') {
+        if ($schema['style']['position-y'] === 'center') {
             $valign = 'middle';
         }
         return array(

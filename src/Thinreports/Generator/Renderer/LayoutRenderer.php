@@ -48,16 +48,11 @@ class LayoutRenderer extends AbstractRenderer
                 continue;
             }
 
-            switch ($type) {
-                case 'text':
-                    foreach ($item['texts'] as $text) {
-                        $text_lines[] = $text;
-                    }
-                    $attributes['content'] = implode("\n", $text_lines);
-                    break;
-                case 'image':
-                    $attributes['xlink:href'] = $item['data']['base64'];
-                    break;
+            if ($type === 'text') {
+                foreach ($item['texts'] as $text) {
+                    $text_lines[] = $text;
+                }
+                $attributes['content'] = implode("\n", $text_lines);
             }
 
             $items[] = $attributes;
@@ -75,16 +70,16 @@ class LayoutRenderer extends AbstractRenderer
                     $this->renderText($attributes);
                     break;
                 case 'image':
-                    $this->renderSVGImage($attributes);
+                    $this->renderImage($attributes);
                     break;
                 case 'rect':
-                    $this->renderSVGRect($attributes);
+                    $this->renderRect($attributes);
                     break;
                 case 'ellipse':
-                    $this->renderSVGEllipse($attributes);
+                    $this->renderEllipse($attributes);
                     break;
                 case 'line':
-                    $this->renderSVGLine($attributes);
+                    $this->renderLine($attributes);
                     break;
                 default:
                     throw new Exception\StandardException('Unknown Element', $type_name);
@@ -123,61 +118,61 @@ class LayoutRenderer extends AbstractRenderer
     }
 
     /**
-     * @param array $svg_attrs
+     * @param array $attrs
      */
-    public function renderSVGRect(array $svg_attrs)
+    public function renderRect(array $attrs)
     {
-        $styles = $this->buildGraphicStyles($svg_attrs);
-        $styles['radius'] = $svg_attrs['rx'];
+        $styles = $this->buildGraphicStyles($attrs['style']);
+        $styles['radius'] = $attrs['border-radius'];
 
         $this->doc->graphics->drawRect(
-            $svg_attrs['x'],
-            $svg_attrs['y'],
-            $svg_attrs['width'],
-            $svg_attrs['height'],
+            $attrs['x'],
+            $attrs['y'],
+            $attrs['width'],
+            $attrs['height'],
             $styles
         );
     }
 
     /**
-     * @param array $svg_attrs
+     * @param array $attrs
      */
-    public function renderSVGEllipse(array $svg_attrs)
+    public function renderEllipse(array $attrs)
     {
         $this->doc->graphics->drawEllipse(
-            $svg_attrs['cx'],
-            $svg_attrs['cy'],
-            $svg_attrs['rx'],
-            $svg_attrs['ry'],
-            $this->buildGraphicStyles($svg_attrs)
+            $attrs['cx'],
+            $attrs['cy'],
+            $attrs['rx'],
+            $attrs['ry'],
+            $this->buildGraphicStyles($attrs['style'])
         );
     }
 
     /**
-     * @param array $svg_attrs
+     * @param array $attrs
      */
-    public function renderSVGLine(array $svg_attrs)
+    public function renderLine(array $attrs)
     {
         $this->doc->graphics->drawLine(
-            $svg_attrs['x1'],
-            $svg_attrs['y1'],
-            $svg_attrs['x2'],
-            $svg_attrs['y2'],
-            $this->buildGraphicStyles($svg_attrs)
+            $attrs['x1'],
+            $attrs['y1'],
+            $attrs['x2'],
+            $attrs['y2'],
+            $this->buildGraphicStyles($attrs['style'])
         );
     }
 
     /**
-     * @param array $svg_attrs
+     * @param array $attrs
      */
-    public function renderSVGImage(array $svg_attrs)
+    public function renderImage(array $attrs)
     {
         $this->doc->graphics->drawBase64Image(
-            $this->extractBase64Data($svg_attrs),
-            $svg_attrs['x'],
-            $svg_attrs['y'],
-            $svg_attrs['width'],
-            $svg_attrs['height']
+            $attrs['data']['base64'],
+            $attrs['x'],
+            $attrs['y'],
+            $attrs['width'],
+            $attrs['height']
         );
     }
 }

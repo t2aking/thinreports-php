@@ -97,7 +97,7 @@ class Page extends BlankPage
      */
     public function getItemIds()
     {
-        return array_keys($this->layout->getItemSchemas());
+        return array_keys($this->layout->getItemSchemas('with_id'));
     }
 
     /**
