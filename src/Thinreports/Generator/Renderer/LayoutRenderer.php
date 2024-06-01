@@ -36,30 +36,27 @@ class LayoutRenderer extends AbstractRenderer
      */
     public function parse(Layout $layout)
     {
-        $svg = preg_replace('<%.+?%>', '', $layout->getSVG());
-
-        $xml = new \SimpleXMLElement($svg);
-        $xml->registerXPathNamespace('svg', 'http://www.w3.org/2000/svg');
-        $xml->registerXPathNamespace('xlink', 'http://www.w3.org/1999/xlink');
-
         $items = array();
+        $text_lines = array();
+        $schema = $layout->getSchema();
 
-        foreach ($xml->g->children() as $element) {
-            $attributes = (array) $element->attributes();
-            $attributes = $attributes['@attributes'];
+        foreach ($schema['items'] as $item) {
+            $attributes = $item;
+            $type = $item['type'];
 
-            switch ($attributes['class']) {
-                case 's-text':
-                    $text_lines = array();
+            if (!($type === 'text' || $type === 'image' || $type === 'rect' || $type === 'ellipse' || $type === 'line')) {
+                continue;
+            }
 
-                    foreach ($element->text as $text_line) {
-                        $text_lines[] = $text_line;
+            switch ($type) {
+                case 'text':
+                    foreach ($item['texts'] as $text) {
+                        $text_lines[] = $text;
                     }
                     $attributes['content'] = implode("\n", $text_lines);
                     break;
-                case 's-image':
-                    $xlink_attribute = $element->attributes('xlink', true);
-                    $attributes['xlink:href'] = (string) $xlink_attribute['href'];
+                case 'image':
+                    $attributes['xlink:href'] = $item['data']['base64'];
                     break;
             }
 
@@ -71,22 +68,22 @@ class LayoutRenderer extends AbstractRenderer
     public function render()
     {
         foreach ($this->items as $attributes) {
-            $type_name = $attributes['class'];
+            $type_name = $attributes['type'];
 
             switch ($type_name) {
-                case 's-text':
-                    $this->renderSVGText($attributes);
+                case 'text':
+                    $this->renderText($attributes);
                     break;
-                case 's-image':
+                case 'image':
                     $this->renderSVGImage($attributes);
                     break;
-                case 's-rect':
+                case 'rect':
                     $this->renderSVGRect($attributes);
                     break;
-                case 's-ellipse':
+                case 'ellipse':
                     $this->renderSVGEllipse($attributes);
                     break;
-                case 's-line':
+                case 'line':
                     $this->renderSVGLine($attributes);
                     break;
                 default:
@@ -97,30 +94,30 @@ class LayoutRenderer extends AbstractRenderer
     }
 
     /**
-     * @param array $svg_attrs
+     * @param array $attrs
      */
-    public function renderSVGText(array $svg_attrs)
+    public function renderText(array $attrs)
     {
-        $styles = $this->buildTextStyles($svg_attrs);
+        $styles = $this->buildTextStyles($attrs['style']);
 
-        if (array_key_exists('x-valign', $svg_attrs)) {
-            $valign = $svg_attrs['x-valign'];
+        if (array_key_exists('vertical-align', $attrs['style'])) {
+            $valign = $attrs['style']['vertical-align'];
         } else {
             $valign = null;
         }
         $styles['valign'] = $this->buildVerticalAlign($valign);
 
-        if (array_key_exists('x-line-height-ratio', $svg_attrs)
-                && $svg_attrs['x-line-height-ratio'] !== '') {
-            $styles['line_height'] = $svg_attrs['x-line-height-ratio'];
+        if (array_key_exists('line-height', $attrs['style'])
+                && $attrs['style']['line-height'] !== '') {
+            $styles['line_height'] = $attrs['style']['line-height'];
         }
 
         $this->doc->text->drawTextBox(
-            $svg_attrs['content'],
-            $svg_attrs['x-left'],
-            $svg_attrs['x-top'],
-            $svg_attrs['x-width'],
-            $svg_attrs['x-height'],
+            $attrs['texts'][0],
+            $attrs['x'],
+            $attrs['y'],
+            $attrs['width'],
+            $attrs['height'],
             $styles
         );
     }

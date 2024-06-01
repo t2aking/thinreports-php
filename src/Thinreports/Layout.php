@@ -68,6 +68,16 @@ class Layout
             throw new Exception\IncompatibleLayout($schema['version'], $rules);
         }
 
+        $items = array();
+        foreach ($schema['items'] as $item) {
+            if ($item['id'] === '') {
+                $items[] = $item;
+            } else {
+                $items[$item['id']] = $item;
+            }
+        }
+        $schema['items'] = $items;
+
         return $schema;
     }
 
