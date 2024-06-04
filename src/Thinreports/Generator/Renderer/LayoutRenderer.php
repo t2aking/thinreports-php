@@ -36,31 +36,23 @@ class LayoutRenderer extends AbstractRenderer
      */
     public function parse(Layout $layout)
     {
-        $svg = preg_replace('<%.+?%>', '', $layout->getSVG());
-
-        $xml = new \SimpleXMLElement($svg);
-        $xml->registerXPathNamespace('svg', 'http://www.w3.org/2000/svg');
-        $xml->registerXPathNamespace('xlink', 'http://www.w3.org/1999/xlink');
-
         $items = array();
+        $text_lines = array();
+        $schema = $layout->getSchema();
 
-        foreach ($xml->g->children() as $element) {
-            $attributes = (array) $element->attributes();
-            $attributes = $attributes['@attributes'];
+        foreach ($schema['items'] as $item) {
+            $attributes = $item;
+            $type = $item['type'];
 
-            switch ($attributes['class']) {
-                case 's-text':
-                    $text_lines = array();
+            if (!($type === 'text' || $type === 'image' || $type === 'rect' || $type === 'ellipse' || $type === 'line')) {
+                continue;
+            }
 
-                    foreach ($element->text as $text_line) {
-                        $text_lines[] = $text_line;
-                    }
-                    $attributes['content'] = implode("\n", $text_lines);
-                    break;
-                case 's-image':
-                    $xlink_attribute = $element->attributes('xlink', true);
-                    $attributes['xlink:href'] = (string) $xlink_attribute['href'];
-                    break;
+            if ($type === 'text') {
+                foreach ($item['texts'] as $text) {
+                    $text_lines[] = $text;
+                }
+                $attributes['content'] = implode("\n", $text_lines);
             }
 
             $items[] = $attributes;
@@ -71,23 +63,23 @@ class LayoutRenderer extends AbstractRenderer
     public function render()
     {
         foreach ($this->items as $attributes) {
-            $type_name = $attributes['class'];
+            $type_name = $attributes['type'];
 
             switch ($type_name) {
-                case 's-text':
-                    $this->renderSVGText($attributes);
+                case 'text':
+                    $this->renderText($attributes);
                     break;
-                case 's-image':
-                    $this->renderSVGImage($attributes);
+                case 'image':
+                    $this->renderImage($attributes);
                     break;
-                case 's-rect':
-                    $this->renderSVGRect($attributes);
+                case 'rect':
+                    $this->renderRect($attributes);
                     break;
-                case 's-ellipse':
-                    $this->renderSVGEllipse($attributes);
+                case 'ellipse':
+                    $this->renderEllipse($attributes);
                     break;
-                case 's-line':
-                    $this->renderSVGLine($attributes);
+                case 'line':
+                    $this->renderLine($attributes);
                     break;
                 default:
                     throw new Exception\StandardException('Unknown Element', $type_name);
@@ -97,90 +89,90 @@ class LayoutRenderer extends AbstractRenderer
     }
 
     /**
-     * @param array $svg_attrs
+     * @param array $attrs
      */
-    public function renderSVGText(array $svg_attrs)
+    public function renderText(array $attrs)
     {
-        $styles = $this->buildTextStyles($svg_attrs);
+        $styles = $this->buildTextStyles($attrs['style']);
 
-        if (array_key_exists('x-valign', $svg_attrs)) {
-            $valign = $svg_attrs['x-valign'];
+        if (array_key_exists('vertical-align', $attrs['style'])) {
+            $valign = $attrs['style']['vertical-align'];
         } else {
             $valign = null;
         }
         $styles['valign'] = $this->buildVerticalAlign($valign);
 
-        if (array_key_exists('x-line-height-ratio', $svg_attrs)
-                && $svg_attrs['x-line-height-ratio'] !== '') {
-            $styles['line_height'] = $svg_attrs['x-line-height-ratio'];
+        if (array_key_exists('line-height', $attrs['style'])
+                && $attrs['style']['line-height'] !== '') {
+            $styles['line_height'] = $attrs['style']['line-height'];
         }
 
         $this->doc->text->drawTextBox(
-            $svg_attrs['content'],
-            $svg_attrs['x-left'],
-            $svg_attrs['x-top'],
-            $svg_attrs['x-width'],
-            $svg_attrs['x-height'],
+            $attrs['texts'][0],
+            $attrs['x'],
+            $attrs['y'],
+            $attrs['width'],
+            $attrs['height'],
             $styles
         );
     }
 
     /**
-     * @param array $svg_attrs
+     * @param array $attrs
      */
-    public function renderSVGRect(array $svg_attrs)
+    public function renderRect(array $attrs)
     {
-        $styles = $this->buildGraphicStyles($svg_attrs);
-        $styles['radius'] = $svg_attrs['rx'];
+        $styles = $this->buildGraphicStyles($attrs['style']);
+        $styles['radius'] = $attrs['border-radius'];
 
         $this->doc->graphics->drawRect(
-            $svg_attrs['x'],
-            $svg_attrs['y'],
-            $svg_attrs['width'],
-            $svg_attrs['height'],
+            $attrs['x'],
+            $attrs['y'],
+            $attrs['width'],
+            $attrs['height'],
             $styles
         );
     }
 
     /**
-     * @param array $svg_attrs
+     * @param array $attrs
      */
-    public function renderSVGEllipse(array $svg_attrs)
+    public function renderEllipse(array $attrs)
     {
         $this->doc->graphics->drawEllipse(
-            $svg_attrs['cx'],
-            $svg_attrs['cy'],
-            $svg_attrs['rx'],
-            $svg_attrs['ry'],
-            $this->buildGraphicStyles($svg_attrs)
+            $attrs['cx'],
+            $attrs['cy'],
+            $attrs['rx'],
+            $attrs['ry'],
+            $this->buildGraphicStyles($attrs['style'])
         );
     }
 
     /**
-     * @param array $svg_attrs
+     * @param array $attrs
      */
-    public function renderSVGLine(array $svg_attrs)
+    public function renderLine(array $attrs)
     {
         $this->doc->graphics->drawLine(
-            $svg_attrs['x1'],
-            $svg_attrs['y1'],
-            $svg_attrs['x2'],
-            $svg_attrs['y2'],
-            $this->buildGraphicStyles($svg_attrs)
+            $attrs['x1'],
+            $attrs['y1'],
+            $attrs['x2'],
+            $attrs['y2'],
+            $this->buildGraphicStyles($attrs['style'])
         );
     }
 
     /**
-     * @param array $svg_attrs
+     * @param array $attrs
      */
-    public function renderSVGImage(array $svg_attrs)
+    public function renderImage(array $attrs)
     {
         $this->doc->graphics->drawBase64Image(
-            $this->extractBase64Data($svg_attrs),
-            $svg_attrs['x'],
-            $svg_attrs['y'],
-            $svg_attrs['width'],
-            $svg_attrs['height']
+            $attrs['data']['base64'],
+            $attrs['x'],
+            $attrs['y'],
+            $attrs['width'],
+            $attrs['height']
         );
     }
 }

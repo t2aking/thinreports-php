@@ -30,23 +30,16 @@ abstract class AbstractRenderer
     }
 
     /**
-     * @param array $svg_attrs
+     * @param array $styles
      * @return array
      */
-    public function buildGraphicStyles(array $svg_attrs)
+    public function buildGraphicStyles(array $styles)
     {
-        if (array_key_exists('stroke-opacity', $svg_attrs)
-            && $svg_attrs['stroke-opacity'] === '0') {
-            $stroke_width = 0;
-        } else {
-            $stroke_width = $svg_attrs['stroke-width'];
-        }
-
         return array(
-            'stroke_color' => $svg_attrs['stroke'],
-            'stroke_width' => $stroke_width,
-            'stroke_dash'  => $svg_attrs['stroke-dasharray'],
-            'fill_color'   => $svg_attrs['fill']
+            'stroke_color' => $styles['border-color'],
+            'stroke_width' => $styles['border-width'],
+            'stroke_dash'  => $styles['border-style'],
+            'fill_color'   => $styles['fill-color']
         );
     }
 
@@ -54,67 +47,16 @@ abstract class AbstractRenderer
      * @param array $svg_attrs
      * @return array
      */
-    public function buildTextStyles(array $svg_attrs)
+    public function buildTextStyles(array $styles)
     {
         return array(
-            'font_family'    => $svg_attrs['font-family'],
-            'font_size'      => $svg_attrs['font-size'],
-            'font_style'     => $this->buildFontStyle($svg_attrs),
-            'color'          => $svg_attrs['fill'],
-            'align'          => $this->buildTextAlign($svg_attrs['text-anchor']),
-            'letter_spacing' => $this->buildLetterSpacing($svg_attrs['letter-spacing'])
+            'font_family'    => $styles['font-family'][0],
+            'font_size'      => $styles['font-size'],
+            'font_style'     => $styles['font-style'],
+            'color'          => $styles['color'],
+            'align'          => $styles['text-align'],
+            'letter_spacing' => $this->buildLetterSpacing($styles['letter-spacing'])
         );
-    }
-
-    /**
-     * @param array $svg_attrs
-     * @return string[]
-     */
-    public function buildFontStyle(array $svg_attrs)
-    {
-        $styles = array();
-
-        if ($svg_attrs['font-weight'] === 'bold') {
-            $styles[] = 'bold';
-        }
-        if ($svg_attrs['font-style'] === 'italic') {
-            $styles[] = 'italic';
-        }
-
-        $decoration = $svg_attrs['text-decoration'];
-
-        if (!empty($decoration) && $decoration !== 'none') {
-            $decorations = explode(' ', $decoration);
-
-            if (in_array('underline', $decorations)) {
-                $styles[] = 'underline';
-            }
-            if (in_array('line-through', $decorations)) {
-                $styles[] = 'strikethrough';
-            }
-        }
-        return $styles;
-    }
-
-    /**
-     * @param string $align
-     * @return string
-     */
-    public function buildTextAlign($align)
-    {
-        switch ($align) {
-            case 'start':
-                return 'left';
-                break;
-            case 'middle':
-                return 'center';
-                break;
-            case 'end':
-                return 'right';
-                break;
-            default:
-                return 'left';
-        }
     }
 
     /**
@@ -137,15 +79,5 @@ abstract class AbstractRenderer
         } else {
             return $letter_spacing;
         }
-    }
-
-    /**
-     * @param array $svg_attrs
-     * @return string
-     */
-    public function extractBase64Data(array $svg_attrs)
-    {
-        return preg_replace('/^data:image\/[a-z]+?;base64,/',
-                            '', $svg_attrs['xlink:href']);
     }
 }

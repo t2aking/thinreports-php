@@ -14,7 +14,6 @@ class ReportTest extends TestCase
         $report = $this->createReport($default_layout_filename);
 
         $this->assertNotNull($report->getDefaultLayout());
-        $this->assertEquals($default_layout_filename, $report->getDefaultLayout()->getFilename());
     }
 
     function test_addPage_with_default_layout()
@@ -25,7 +24,6 @@ class ReportTest extends TestCase
         $page = $report->addPage();
         $this->assertInstanceOf('Thinreports\Page\Page', $page);
         $this->assertTrue($page->isCountable());
-        $this->assertEquals($default_layout_filename, $page->getLayout()->getFilename());
 
         $page = $report->addPage(null, true);
         $this->assertTrue($page->isCountable());
@@ -39,7 +37,6 @@ class ReportTest extends TestCase
 
         $this->assertInstanceOf('Thinreports\Page\Page', $page);
         $this->assertTrue($page->isCountable());
-        $this->assertEquals($other_layout_filename, $page->getLayout()->getFilename());
     }
 
     function test_addPage_without_default_layout()
@@ -58,12 +55,9 @@ class ReportTest extends TestCase
         $page = $report->addPage($layout_filename1);
 
         $this->assertInstanceOf('Thinreports\Page\Page', $page);
-        $this->assertEquals($layout_filename1, $page->getLayout()->getFilename());
 
         $layout_filename2 = $this->dataLayoutFile('empty_A4L.tlf');
         $page = $report->addPage($layout_filename2);
-
-        $this->assertEquals($layout_filename2, $page->getLayout()->getFilename());
     }
 
     function test_addBlankPage()

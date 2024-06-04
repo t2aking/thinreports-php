@@ -11,21 +11,18 @@ class PageTest extends TestCase
 {
     private $report;
     private $layout;
-    private $item_formats;
+    private $item_schemas;
 
     function setup()
     {
-        $this->item_formats = $this->dataItemFormats(array(
+        $this->item_schemas = $this->dataItemFormats(array(
             array('text_block', 'default'),
             array('image_block', 'default'),
             array('text', 'default')
         ));
 
         $this->report = new Report($this->dataLayoutFile('empty_A4P.tlf'));
-        $this->layout = new Layout('dummy.tlf', array(
-            'format' => array('svg' => '<svg></svg>'),
-            'item_formats' => $this->item_formats
-        ));
+        $this->layout = new Layout(array('items' => $this->item_schemas),'dummy.tlf');
     }
 
     private function newPage($is_countable = true)
@@ -157,9 +154,9 @@ class PageTest extends TestCase
         $page = $this->newPage();
 
         $expects = array(
-            new Item\TextBlockItem($page, $this->item_formats['text_block_default']),
-            new Item\ImageBlockItem($page, $this->item_formats['image_block_default']),
-            new Item\BasicItem($page, $this->item_formats['text_default'])
+            new Item\TextBlockItem($page, $this->item_schemas['text_block_default']),
+            new Item\ImageBlockItem($page, $this->item_schemas['image_block_default']),
+            new Item\BasicItem($page, $this->item_schemas['text_default'])
         );
         $this->assertEquals($expects, $page->getFinalizedItems());
     }
