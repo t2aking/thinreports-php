@@ -1,1 +1,44 @@
-{"version":"0.8.2","config":{"title":"","option":{},"page":{"paper-type":"A3","orientation":"portrait","margin-top":"20","margin-bottom":"20","margin-left":"20","margin-right":"20"}},"svg":"<svg width=\"841.8\" height=\"1190.5\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" preserveAspectRatio=\"none\" viewBox=\"0 0 841.8 1190.5\"><g class=\"canvas\"><g class=\"s-text\" stroke-width=\"0\" fill=\"#000000\" fill-opacity=\"1\" kerning=\"auto\" letter-spacing=\"normal\" x-display=\"true\" x-id=\"\" id=\"goog_734074267\" font-size=\"18\" font-family=\"Helvetica\" font-weight=\"normal\" font-style=\"normal\" text-anchor=\"start\" text-decoration=\"none\" x-width=\"200\" x-height=\"100\" x-left=\"20\" x-top=\"20\"><rect class=\"s-text-box\" stroke=\"none\" fill=\"#000000\" fill-opacity=\"0.001\" width=\"200\" height=\"100\" x=\"20\" y=\"20\"/><text class=\"s-text-l0\" xml:space=\"preserve\" stroke=\"none\" fill=\"inherit\" fill-opacity=\"1\" text-decoration=\"none\" x=\"20\" y=\"37\">A3 Portrait</text></g></g></svg>","state":{"layout-guide":[]}}
+{
+  "version": "0.9.0",
+  "title": "",
+  "report": {
+    "paper-type": "A3",
+    "width": 0.0,
+    "height": 0.0,
+    "orientation": "portrait",
+    "margin": [
+      20.0,
+      20.0,
+      20.0,
+      20.0
+    ]
+  },
+  "items": [
+    {
+      "id": "",
+      "type": "text",
+      "x": 20.0,
+      "y": 20.0,
+      "width": 200.0,
+      "height": 100.0,
+      "display": true,
+      "texts": [
+        "A3 Portrait"
+      ],
+      "style": {
+        "font-family": [
+          "Helvetica"
+        ],
+        "font-size": 18.0,
+        "color": "#000000",
+        "font-style": [
+
+        ],
+        "text-align": "left",
+        "vertical-align": "",
+        "line-height": "",
+        "letter-spacing": ""
+      }
+    }
+  ]
+}
