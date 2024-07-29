@@ -17,9 +17,9 @@ class StandardException extends \Exception
     protected $subject = null;
 
     /**
-     * @param string $messages,...
+     * @param string $message,...
      */
-    public function __construct($messages)
+    public function __construct(string $message)
     {
         $messages = func_get_args();
 
@@ -32,7 +32,7 @@ class StandardException extends \Exception
     /**
      * @return string
      */
-    public function getSubject()
+    public function getSubject(): string
     {
         return $this->subject;
     }
