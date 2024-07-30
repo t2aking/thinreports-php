@@ -33,19 +33,19 @@ abstract class AbstractItem
     }
 
     /**
-     * @param boolean $visible
+     * @param bool $visible
      * @return $this
      */
-    public function setVisible($visible)
+    public function setVisible(bool $visible): AbstractItem
     {
         $this->is_visible = $visible;
         return $this;
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isVisible()
+    public function isVisible(): bool
     {
         return $this->is_visible;
     }
@@ -53,7 +53,7 @@ abstract class AbstractItem
     /**
      * @return $this
      */
-    public function hide()
+    public function hide(): AbstractItem
     {
         $this->setVisible(false);
         return $this;
@@ -62,7 +62,7 @@ abstract class AbstractItem
     /**
      * @return $this
      */
-    public function show()
+    public function show(): AbstractItem
     {
         $this->setVisible(true);
         return $this;
@@ -71,15 +71,15 @@ abstract class AbstractItem
     /**
      * @return string
      */
-    public function getId()
+    public function getId(): string
     {
         return $this->schema['id'];
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isDynamic()
+    public function isDynamic(): bool
     {
         return $this->is_dynamic;
     }
@@ -91,7 +91,7 @@ abstract class AbstractItem
      * @throws Thinreports\Exception\StandardException
      * @throws Thinreports\Exception\UnavailableStyleValue
      */
-    public function setStyle($name, $style)
+    public function setStyle(string $name, $style): AbstractItem
     {
         $this->style->set($name, $style);
         return $this;
@@ -103,7 +103,7 @@ abstract class AbstractItem
      * @throws Thinreports\Exception\StandardException
      * @throws Thinreports\Exception\UnavailableStyleValue
      */
-    public function setStyles(array $styles)
+    public function setStyles(array $styles): AbstractItem
     {
         foreach ($styles as $name => $style) {
             $this->setStyle($name, $style);
@@ -125,7 +125,7 @@ abstract class AbstractItem
      *
      * @return array
      */
-    public function exportStyles()
+    public function exportStyles(): array
     {
         return $this->style->export();
     }
@@ -140,7 +140,7 @@ abstract class AbstractItem
      *
      * @return Page
      */
-    public function getParent()
+    public function getParent(): Page
     {
         return $this->parent;
     }
@@ -150,7 +150,7 @@ abstract class AbstractItem
      *
      * @return array
      */
-    public function getSchema()
+    public function getSchema(): array
     {
         return $this->schema;
     }
@@ -159,9 +159,9 @@ abstract class AbstractItem
      * @access private
      *
      * @param string $type_name
-     * @return boolean
+     * @return bool
      */
-    public function isTypeOf($type_name)
+    public function isTypeOf(string $type_name): bool
     {
         return $this->schema['type'] === $type_name;
     }
@@ -171,5 +171,5 @@ abstract class AbstractItem
      *
      * @return array
      */
-    abstract public function getBounds();
+    abstract public function getBounds(): array;
 }

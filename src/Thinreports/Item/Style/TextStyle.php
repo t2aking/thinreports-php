@@ -10,6 +10,7 @@
 namespace Thinreports\Item\Style;
 
 use Thinreports\Exception;
+use Thinreports\Exception\UnavailableStyleValue;
 
 /**
  * @access private
@@ -24,7 +25,7 @@ class TextStyle extends BasicStyle
     /**
      * @param string $color
      */
-    public function set_color($color)
+    public function set_color(string $color): void
     {
         $this->styles['color'] = $color;
     }
@@ -32,7 +33,7 @@ class TextStyle extends BasicStyle
     /**
      * @return string
      */
-    public function get_color()
+    public function get_color(): string
     {
         return $this->readStyle('color');
     }
@@ -40,7 +41,7 @@ class TextStyle extends BasicStyle
     /**
      * @param float|integer $size
      */
-    public function set_font_size($size)
+    public function set_font_size($size): void
     {
         $this->styles['font-size'] = $size;
     }
@@ -54,9 +55,9 @@ class TextStyle extends BasicStyle
     }
 
     /**
-     * @param boolean $enable
+     * @param bool $enable
      */
-    public function set_bold($enable)
+    public function set_bold(bool $enable): void
     {
         $this->updateFontStyle('bold', $enable);
     }
@@ -64,55 +65,55 @@ class TextStyle extends BasicStyle
     /**
      * @return boolean
      */
-    public function get_bold()
+    public function get_bold(): bool
     {
         return $this->hasFontStyle('bold');
     }
 
     /**
-     * @param boolean $enable
+     * @param bool $enable
      */
-    public function set_italic($enable)
+    public function set_italic(bool $enable): void
     {
         $this->updateFontStyle('italic', $enable);
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function get_italic()
+    public function get_italic(): bool
     {
         return $this->hasFontStyle('italic');
     }
 
     /**
-     * @param boolean $enable
+     * @param bool $enable
      */
-    public function set_underline($enable)
+    public function set_underline(bool $enable): void
     {
         $this->updateFontStyle('underline', $enable);
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function get_underline()
+    public function get_underline(): bool
     {
         return $this->hasFontStyle('underline');
     }
 
     /**
-     * @param boolean $enable
+     * @param bool $enable
      */
-    public function set_linethrough($enable)
+    public function set_linethrough(bool $enable): void
     {
         $this->updateFontStyle('linethrough', $enable);
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function get_linethrough()
+    public function get_linethrough(): bool
     {
         return $this->hasFontStyle('linethrough');
     }
@@ -137,8 +138,9 @@ class TextStyle extends BasicStyle
 
     /**
      * @param string $alignment
+     * @throws UnavailableStyleValue
      */
-    public function set_valign($alignment)
+    public function set_valign(string $alignment): void
     {
         $this->verifyStyleValue('valign', $alignment, array('top', 'middle', 'bottom'));
         $this->styles['vertical-align'] = $alignment;
@@ -147,7 +149,7 @@ class TextStyle extends BasicStyle
     /**
      * @return string
      */
-    public function get_valign()
+    public function get_valign(): string
     {
         $alignment = $this->readStyle('vertical-align');
         return $alignment === '' ? 'top' : $alignment;
@@ -155,9 +157,9 @@ class TextStyle extends BasicStyle
 
     /**
      * @param string $type Availables are "bold", "italic", "underline", "linethrough"
-     * @param boolean $enable
+     * @param bool $enable
      */
-    private function updateFontStyle($type, $enable)
+    private function updateFontStyle(string $type, bool $enable): void
     {
         if ($enable) {
             $this->enableFontStyle($type);
@@ -169,20 +171,20 @@ class TextStyle extends BasicStyle
     /**
      * @param string $type {@see self::updateFontStyle()}
      */
-    private function enableFontStyle($type)
+    private function enableFontStyle(string $type): void
     {
         if (!$this->hasFontStyle($type)) {
-            array_push($this->styles['font-style'], $type);
+            $this->styles['font-style'][] = $type;
         }
     }
 
     /**
      * @param string $type {@see self::updateFontStyle()}
      */
-    private function disableFontStyle($type)
+    private function disableFontStyle(string $type): void
     {
         if ($this->hasFontStyle($type)) {
-            $index = array_search($type, $this->styles['font-style']);
+            $index = array_search($type, $this->styles['font-style'], true);
             array_splice($this->styles['font-style'], $index, 1);
         }
     }
@@ -191,8 +193,8 @@ class TextStyle extends BasicStyle
      * @param string $type {@see self::updateFontStyle()}
      * @return boolean
      */
-    private function hasFontStyle($type)
+    private function hasFontStyle(string $type): bool
     {
-        return array_search($type, $this->styles['font-style']) !== false;
+        return in_array($type, $this->styles['font-style'], true);
     }
 }

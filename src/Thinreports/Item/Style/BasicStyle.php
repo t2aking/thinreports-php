@@ -10,6 +10,7 @@
 namespace Thinreports\Item\Style;
 
 use Thinreports\Exception;
+use Thinreports\Exception\StandardException;
 
 /**
  * @access private
@@ -30,8 +31,9 @@ class BasicStyle
     /**
      * @param string $style_name
      * @param mixed $value
+     * @throws StandardException
      */
-    public function set($style_name, $value)
+    public function set(string $style_name, $value): void
     {
         $this->verifyStyleName($style_name);
 
@@ -42,8 +44,9 @@ class BasicStyle
     /**
      * @param string $style_name
      * @return mixed $value
+     * @throws StandardException
      */
-    public function get($style_name)
+    public function get(string $style_name)
     {
         $this->verifyStyleName($style_name);
 
@@ -54,7 +57,7 @@ class BasicStyle
     /**
      * @return array
      */
-    public function export()
+    public function export(): array
     {
         return $this->styles;
     }
@@ -63,24 +66,24 @@ class BasicStyle
      * @param string $raw_style_name
      * @return mixed
      */
-    public function readStyle($raw_style_name)
+    public function readStyle(string $raw_style_name)
     {
         if (array_key_exists($raw_style_name, $this->styles)) {
             return $this->styles[$raw_style_name];
-        } else {
-            if (array_key_exists('style', $this->styles) && array_key_exists($raw_style_name, $this->styles['style'])) {
-                return $this->styles['style'][$raw_style_name];
-            } else {
-                return null;
-            }
         }
+
+        if (array_key_exists('style', $this->styles) && array_key_exists($raw_style_name, $this->styles['style'])) {
+            return $this->styles['style'][$raw_style_name];
+        }
+
+        return null;
     }
 
     /**
      * @param string $style_name
      * @throws Exception\StandardException
      */
-    public function verifyStyleName($style_name)
+    public function verifyStyleName(string $style_name): void
     {
         if (!in_array($style_name, static::$available_style_names, true)) {
             throw new Exception\StandardException('Unavailable Style Name', $style_name);
@@ -90,10 +93,10 @@ class BasicStyle
     /**
      * @param string $style_name
      * @param mixed $value
-     * @param mixed[] $allows
+     * @param array $allows
      * @throws Exception\UnavailableStyleValue
      */
-    public function verifyStyleValue($style_name, $value, array $allows)
+    public function verifyStyleValue(string $style_name, $value, array $allows): void
     {
         if (!in_array($value, $allows, true)) {
             throw new Exception\UnavailableStyleValue($style_name, $value, $allows);

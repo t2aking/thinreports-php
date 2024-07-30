@@ -9,6 +9,7 @@
 
 namespace Thinreports\Item;
 
+use Thinreports\Exception\StandardException;
 use Thinreports\Page\Page;
 use Thinreports\Item\Style\TextStyle;
 use Thinreports\Item\TextFormatter;
@@ -16,7 +17,7 @@ use Thinreports\Exception;
 
 class TextBlockItem extends AbstractBlockItem
 {
-    const TYPE_NAME = 'text-block';
+    public const TYPE_NAME = 'text-block';
 
     private $format_enabled = null;
     private $reference_item = null;
@@ -45,34 +46,36 @@ class TextBlockItem extends AbstractBlockItem
      * {@inheritdoc}
      * @throws Exception\StandardException
      */
-    public function setValue($value)
+    public function setValue($value): AbstractBlockItem
     {
         if ($this->hasReference()) {
             throw new Exception\StandardException('Readonly Item', $this->getId(),
                 "It can't be overwritten, because it has references to the other.");
-        } else {
-            parent::setValue($value);
         }
+
+        parent::setValue($value);
+
         return $this;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getValue()
+    public function getValue(): ?string
     {
         if ($this->hasReference()) {
             return $this->reference_item->getValue();
-        } else {
-            return parent::getValue();
         }
+
+        return parent::getValue();
     }
 
     /**
-     * @param boolean $enable
+     * @param bool $enable
      * @return $this
+     * @throws StandardException
      */
-    public function setFormatEnabled($enable)
+    public function setFormatEnabled(bool $enable): AbstractBlockItem
     {
         if ($enable) {
             if ($this->isMultiple()) {
@@ -89,9 +92,9 @@ class TextBlockItem extends AbstractBlockItem
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isFormatEnabled()
+    public function isFormatEnabled(): bool
     {
         return $this->format_enabled;
     }
@@ -105,17 +108,17 @@ class TextBlockItem extends AbstractBlockItem
     {
         if ($this->isFormatEnabled()) {
             return $this->formatter->format($this->getValue());
-        } else {
-            return $this->getValue();
         }
+
+        return $this->getValue();
     }
 
     /**
      * @access private
      *
-     * @return boolean
+     * @return bool
      */
-    public function isMultiple()
+    public function isMultiple(): bool
     {
         return $this->schema['multiple-line'] === true;
     }
@@ -123,9 +126,9 @@ class TextBlockItem extends AbstractBlockItem
     /**
      * @access private
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasFormatSettings()
+    public function hasFormatSettings(): bool
     {
         $text_format = $this->schema['format'];
         return $text_format['type'] !== '' || $text_format['base'] !== '';
@@ -134,9 +137,9 @@ class TextBlockItem extends AbstractBlockItem
     /**
      * @access private
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasReference()
+    public function hasReference(): bool
     {
         return $this->schema['reference-id'] !== '';
     }

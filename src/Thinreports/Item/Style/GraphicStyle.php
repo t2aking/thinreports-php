@@ -24,7 +24,7 @@ class GraphicStyle extends BasicStyle
     /**
      * @param float|integer $width
      */
-    public function set_border_width($width)
+    public function set_border_width($width): void
     {
         $this->styles['border-width'] = $width;
     }
@@ -40,7 +40,7 @@ class GraphicStyle extends BasicStyle
     /**
      * @param string $color
      */
-    public function set_border_color($color)
+    public function set_border_color(string $color): void
     {
         $this->styles['border-color'] = $color;
     }
@@ -48,26 +48,26 @@ class GraphicStyle extends BasicStyle
     /**
      * @return string
      */
-    public function get_border_color()
+    public function get_border_color(): string
     {
         return $this->readStyle('border-color');
     }
 
     /**
-     * @param mixed[] $width_and_color
+     * @param array $width_and_color
      */
-    public function set_border($width_and_color)
+    public function set_border(array $width_and_color): void
     {
-        list($width, $color) = $width_and_color;
+        [$width, $color] = $width_and_color;
 
         $this->set_border_width($width);
         $this->set_border_color($color);
     }
 
     /**
-     * @return mixed[]
+     * @return array
      */
-    public function get_border()
+    public function get_border(): array
     {
         return array($this->get_border_width(), $this->get_border_color());
     }
@@ -75,7 +75,7 @@ class GraphicStyle extends BasicStyle
     /**
      * @param string $color
      */
-    public function set_fill_color($color)
+    public function set_fill_color(string $color): void
     {
         $this->styles['fill-color'] = $color;
     }
@@ -83,7 +83,7 @@ class GraphicStyle extends BasicStyle
     /**
      * @return string
      */
-    public function get_fill_color()
+    public function get_fill_color(): string
     {
         return $this->readStyle('fill-color');
     }

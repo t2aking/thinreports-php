@@ -8,7 +8,8 @@ use Thinreports\Item\Style\GraphicStyle;
 
 class TestItem extends AbstractItem
 {
-    public function getBounds() {}
+    public function getBounds(): array
+    {}
 }
 
 class TestGraphicsItem extends AbstractItem
@@ -22,7 +23,8 @@ class TestGraphicsItem extends AbstractItem
         $this->style = new GraphicStyle($schema);
     }
 
-    public function getBounds() {}
+    public function getBounds(): array
+    {}
 }
 
 class AbstractItemTest extends TestCase

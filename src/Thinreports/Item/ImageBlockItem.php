@@ -14,7 +14,7 @@ use Thinreports\Item\Style\BasicStyle;
 
 class ImageBlockItem extends AbstractBlockItem
 {
-    const TYPE_NAME = 'image-block';
+    public const TYPE_NAME = 'image-block';
 
     /**
      * {@inheritdoc}
@@ -37,8 +37,8 @@ class ImageBlockItem extends AbstractBlockItem
     /**
      * @see self::getValue()
      */
-    public function getSource()
+    public function getSource(): ?string
     {
-        return call_user_func(array($this, 'getValue'));
+        return $this->getValue();
     }
 }
