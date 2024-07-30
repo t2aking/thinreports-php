@@ -5,7 +5,7 @@ use Thinreports\TestCase;
 
 class BlankPageTest extends TestCase
 {
-    function test_isCountable()
+    public function test_isCountable(): void
     {
         $blank_page = new BlankPage(1);
         $this->assertTrue($blank_page->isCountable());
@@ -14,13 +14,13 @@ class BlankPageTest extends TestCase
         $this->assertFalse($blank_page->isCountable());
     }
 
-    function test_isBlank()
+    public function test_isBlank(): void
     {
         $blank_page = new BlankPage(1);
         $this->assertTrue($blank_page->isBlank());
     }
 
-    function test_getNo()
+    public function test_getNo(): void
     {
         $blank_page = new BlankPage(5);
         $this->assertEquals(5, $blank_page->getNo());

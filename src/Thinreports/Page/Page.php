@@ -9,6 +9,8 @@
 
 namespace Thinreports\Page;
 
+use Thinreports\Exception\StandardException;
+use Thinreports\Item\AbstractItem;
 use Thinreports\Report;
 use Thinreports\Layout;
 use Thinreports\Exception;
@@ -22,10 +24,10 @@ class Page extends BlankPage
     /**
      * @param Report $report
      * @param Layout $layout
-     * @param integer $page_number
-     * @param boolean $countable
+     * @param int $page_number
+     * @param bool $countable
      */
-    public function __construct(Report $report, Layout $layout, $page_number, $countable = true)
+    public function __construct(Report $report, Layout $layout, int $page_number, bool $countable = true)
     {
         parent::__construct($page_number, $countable);
 
@@ -36,9 +38,10 @@ class Page extends BlankPage
 
     /**
      * @param string $id
-     * @return \Thinreports\Item\AbstractItem
+     * @return AbstractItem
+     * @throws StandardException
      */
-    public function item($id)
+    public function item(string $id): AbstractItem
     {
         if (array_key_exists($id, $this->items)) {
             return $this->items[$id];
@@ -51,9 +54,10 @@ class Page extends BlankPage
     }
 
     /**
+     * @throws StandardException
      * @see self::item()
      */
-    public function __invoke($id)
+    public function __invoke(string $id): AbstractItem
     {
         return $this->item($id);
     }
@@ -63,20 +67,21 @@ class Page extends BlankPage
      * @param mixed $value
      * @throws Exception\StandardException
      */
-    public function setItemValue($id, $value)
+    public function setItemValue(string $id, $value): void
     {
         $item = $this->item($id);
 
         if (!$item->isTypeOf('block')) {
-            throw new Exception\StandardException('Unedtiable Item', $id);
+            throw new Exception\StandardException('Undeniable Item', $id);
         }
         $item->setValue($value);
     }
 
     /**
      * @param array $values
+     * @throws StandardException
      */
-    public function setItemValues(array $values)
+    public function setItemValues(array $values): void
     {
         foreach ($values as $id => $value) {
             $this->setItemValue($id, $value);
@@ -85,17 +90,17 @@ class Page extends BlankPage
 
     /**
      * @param string $id
-     * @return boolean
+     * @return bool
      */
-    public function hasItem($id)
+    public function hasItem(string $id): bool
     {
         return $this->layout->hasItemById($id);
     }
 
     /**
-     * @return string[]
+     * @return array
      */
-    public function getItemIds()
+    public function getItemIds(): array
     {
         return array_keys($this->layout->getItemSchemas('with_id'));
     }
@@ -105,7 +110,7 @@ class Page extends BlankPage
      *
      * @return Report
      */
-    public function getReport()
+    public function getReport(): Report
     {
         return $this->report;
     }
@@ -115,7 +120,7 @@ class Page extends BlankPage
      *
      * @return Layout
      */
-    public function getLayout()
+    public function getLayout(): Layout
     {
         return $this->layout;
     }
@@ -124,8 +129,9 @@ class Page extends BlankPage
      * @access private
      *
      * @return Thinreports\Item\AbstractItem[]
+     * @throws StandardException
      */
-    public function getFinalizedItems()
+    public function getFinalizedItems(): array
     {
         $items = array();
 

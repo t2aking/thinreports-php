@@ -16,35 +16,35 @@ class BlankPage
     protected $is_countable = true;
 
     /**
-     * @param integer $page_number
-     * @param boolean $countable
+     * @param int $page_number
+     * @param bool $countable
      */
-    public function __construct($page_number, $countable = true)
+    public function __construct(int $page_number, bool $countable = true)
     {
         $this->number = $page_number;
         $this->is_countable = $countable;
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isCountable()
+    public function isCountable(): bool
     {
         return $this->is_countable;
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isBlank()
+    public function isBlank(): bool
     {
         return $this->is_blank;
     }
 
     /**
-     * @return integer
+     * @return int
      */
-    public function getNo()
+    public function getNo(): int
     {
         return $this->number;
     }
