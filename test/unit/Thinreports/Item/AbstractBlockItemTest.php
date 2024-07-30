@@ -10,7 +10,7 @@ class AbstractBlockItemTest extends TestCase
 {
     private $test_item;
 
-    function setup()
+    public function setup(): void
     {
         $report = new Report($this->dataLayoutFile('empty_A4P.tlf'));
         $parent = $report->addPage();
@@ -25,19 +25,19 @@ class AbstractBlockItemTest extends TestCase
         $this->test_item = new TestBlockItem($parent, $schema);
     }
 
-    function test_setValue()
+    public function test_setValue(): void
     {
         $this->test_item->setValue(1000);
         $this->assertAttributeEquals(1000, 'value', $this->test_item);
     }
 
-    function test_getValue()
+    public function test_getValue(): void
     {
         $this->test_item->setValue(9999);
         $this->assertEquals(9999, $this->test_item->getValue());
     }
 
-    function test_isEmpty()
+    public function test_isEmpty(): void
     {
         $this->test_item->setValue('');
         $this->assertTrue($this->test_item->isEmpty());
@@ -55,7 +55,7 @@ class AbstractBlockItemTest extends TestCase
         $this->assertFalse($this->test_item->isEmpty());
     }
 
-    function test_isPresent()
+    public function test_isPresent(): void
     {
         $this->test_item->setValue('');
         $this->assertFalse($this->test_item->isPresent());
@@ -73,7 +73,7 @@ class AbstractBlockItemTest extends TestCase
         $this->assertTrue($this->test_item->isPresent());
     }
 
-    function test_getBounds()
+    public function test_getBounds(): void
     {
         $this->assertSame(
             array('x' => 100, 'y' => 100, 'width' => 100, 'height' => 100),
@@ -81,7 +81,7 @@ class AbstractBlockItemTest extends TestCase
         );
     }
 
-    function test_isTypeOf()
+    public function test_isTypeOf(): void
     {
         $this->assertTrue($this->test_item->isTypeOf('test-block'));
     }

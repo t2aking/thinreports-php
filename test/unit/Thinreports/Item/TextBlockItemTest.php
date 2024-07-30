@@ -1,17 +1,21 @@
 <?php
 namespace Thinreports\Item;
 
+use Thinreports\Exception\StandardException;
 use Thinreports\TestCase;
 use Thinreports\Report;
 use Thinreports\Layout;
 use Thinreports\Page\Page;
 use Thinreports\Exception;
+use Thinreports\Item\Style\TextStyle;
+use Thinreports\Item\TextFormatter;
+use Thinreports\Item\TextBlockItem;
 
 class TextBlockItemTest extends TestCase
 {
     private $page;
 
-    function setup()
+    public function setup(): void
     {
         $text_block_formats = $this->dataItemFormatsFor('text_block');
 
@@ -22,18 +26,18 @@ class TextBlockItemTest extends TestCase
         $this->page = new Page($report, $layout, 1);
     }
 
-    private function newTextBlock($data_format_key)
+    private function newTextBlock($data_format_key): TextBlockItem
     {
         $format = $this->dataItemFormat('text_block', $data_format_key);
         return new TextBlockItem($this->page, $format);
     }
 
-    function test_initialize()
+    public function test_initialize(): void
     {
         $text_block = $this->newTextBlock('default');
 
-        $this->assertAttributeInstanceOf('Thinreports\Item\Style\TextStyle', 'style', $text_block);
-        $this->assertAttributeInstanceOf('Thinreports\Item\TextFormatter', 'formatter', $text_block);
+        $this->assertAttributeInstanceOf(TextStyle::class, 'style', $text_block);
+        $this->assertAttributeInstanceOf(TextFormatter::class, 'formatter', $text_block);
         $this->assertAttributeSame('', 'value', $text_block);
         $this->assertAttributeSame(false, 'format_enabled', $text_block);
         $this->assertAttributeSame(null, 'reference_item', $text_block);
@@ -44,11 +48,14 @@ class TextBlockItemTest extends TestCase
 
         $text_block = $this->newTextBlock('with_reference_to_default');
 
-        $this->assertAttributeInstanceOf('Thinreports\Item\TextBlockItem',
+        $this->assertAttributeInstanceOf(TextBlockItem::class,
             'reference_item', $text_block);
     }
 
-    function test_setValue()
+    /**
+     * @throws StandardException
+     */
+    public function test_setValue(): void
     {
         $text_block = $this->newTextBlock('default');
 
@@ -67,7 +74,10 @@ class TextBlockItemTest extends TestCase
         }
     }
 
-    function test_getValue()
+    /**
+     * @throws StandardException
+     */
+    public function test_getValue(): void
     {
         $text_block = $this->newTextBlock('with_default_value');
 
@@ -85,7 +95,10 @@ class TextBlockItemTest extends TestCase
         $this->assertEquals('foo', $text_block_refs->getValue());
     }
 
-    function test_setFormatEnabled()
+    /**
+     * @throws StandardException
+     */
+    public function test_setFormatEnabled(): void
     {
         $text_block = $this->newTextBlock('with_number_formatting');
 
@@ -116,7 +129,10 @@ class TextBlockItemTest extends TestCase
         }
     }
 
-    function test_isFormatEnabled()
+    /**
+     * @throws StandardException
+     */
+    public function test_isFormatEnabled(): void
     {
         $text_block = $this->newTextBlock('with_number_formatting');
         $this->assertTrue($text_block->isFormatEnabled());
@@ -125,7 +141,10 @@ class TextBlockItemTest extends TestCase
         $this->assertFalse($text_block->isFormatEnabled());
     }
 
-    function test_getRealValue()
+    /**
+     * @throws StandardException
+     */
+    public function test_getRealValue(): void
     {
         $text_block = $this->newTextBlock('with_number_formatting');
         $text_block->setValue(1000);
@@ -141,7 +160,7 @@ class TextBlockItemTest extends TestCase
         $this->assertEquals(1000, $text_block->getRealValue());
     }
 
-    function test_isMultiple()
+    public function test_isMultiple(): void
     {
         $text_block = $this->newTextBlock('with_multiple');
         $this->assertTrue($text_block->isMultiple());
@@ -150,7 +169,7 @@ class TextBlockItemTest extends TestCase
         $this->assertFalse($text_block->isMultiple());
     }
 
-    function test_hasReference()
+    public function test_hasReference(): void
     {
         $text_block = $this->newTextBlock('with_reference_to_default');
         $this->assertTrue($text_block->hasReference());
@@ -159,7 +178,7 @@ class TextBlockItemTest extends TestCase
         $this->assertFalse($text_block->hasReference());
     }
 
-    function test_hasFormatSettings()
+    public function test_hasFormatSettings(): void
     {
         $text_block = $this->newTextBlock('with_number_formatting');
         $this->assertTrue($text_block->hasFormatSettings());

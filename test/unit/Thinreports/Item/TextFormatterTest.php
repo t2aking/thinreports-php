@@ -5,7 +5,7 @@ use Thinreports\TestCase;
 
 class TextFormatterTest extends TestCase
 {
-    function test_number_format()
+    public function test_number_format(): void
     {
         $formatter = new TextFormatter(array(
             'type' => 'number',
@@ -44,7 +44,7 @@ class TextFormatterTest extends TestCase
         $this->assertEquals('$1,000.0', $formatter->format(999.99));
     }
 
-    function test_datetime_format()
+    public function test_datetime_format(): void
     {
         $formatter = new TextFormatter(array(
             'type' => 'datetime',
@@ -74,7 +74,7 @@ class TextFormatterTest extends TestCase
         $this->assertEquals('2015/7/1 is Wednesday.', $formatter->format('2015/7/1'));
     }
 
-    function test_padding_format()
+    public function test_padding_format(): void
     {
         $formatter = new TextFormatter(array(
             'type' => 'padding',
@@ -139,7 +139,7 @@ class TextFormatterTest extends TestCase
         $this->assertEquals('(  999)', $formatter->format(999));
     }
 
-    function test_format()
+    public function test_format(): void
     {
         $formatter = new TextFormatter(array(
             'type' => 'number',
