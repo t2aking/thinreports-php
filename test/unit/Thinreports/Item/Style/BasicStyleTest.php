@@ -101,5 +101,7 @@ class BasicStyleTest extends TestCase
         } catch (\Exception $e) {
             $this->fail();
         }
+
+        $this->assertTrue(true);
     }
 }
