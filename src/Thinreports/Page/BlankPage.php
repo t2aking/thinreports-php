@@ -16,10 +16,10 @@ class BlankPage
     protected $is_countable = true;
 
     /**
-     * @param int $page_number
+     * @param int|null $page_number
      * @param bool $countable
      */
-    public function __construct(int $page_number, bool $countable = true)
+    public function __construct(?int $page_number, bool $countable = true)
     {
         $this->number = $page_number;
         $this->is_countable = $countable;

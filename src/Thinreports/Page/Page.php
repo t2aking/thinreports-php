@@ -24,10 +24,10 @@ class Page extends BlankPage
     /**
      * @param Report $report
      * @param Layout $layout
-     * @param int $page_number
+     * @param int|null $page_number
      * @param bool $countable
      */
-    public function __construct(Report $report, Layout $layout, int $page_number, bool $countable = true)
+    public function __construct(Report $report, Layout $layout, ?int $page_number, bool $countable = true)
     {
         parent::__construct($page_number, $countable);
 

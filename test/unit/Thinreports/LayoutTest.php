@@ -2,11 +2,12 @@
 namespace Thinreports;
 
 use Thinreports\Exception;
+use Thinreports\Exception\StandardException;
 use Thinreports\Item;
 
 class LayoutTest extends TestCase
 {
-    function test_loadFile()
+    public function test_loadFile(): void
     {
         try {
             Layout::loadFile('nonexistent.tlf');
@@ -15,20 +16,29 @@ class LayoutTest extends TestCase
             $this->assertEquals('Layout File Not Found', $e->getSubject());
         }
 
-        $layout = Layout::loadFile($this->dataLayoutFile('empty_A4P.tlf'));
-        $this->assertInstanceOf('Thinreports\Layout', $layout);
+        try {
+            $layout = Layout::loadFile($this->dataLayoutFile('empty_A4P.tlf'));
+        } catch (StandardException $e) {
+            $this->fail($e->getMessage());
+        }
+
+        $this->assertNotNull($layout);
     }
 
-    function test_loadData()
+    public function test_loadData(): void
     {
         $schema_data = '{"version":"0.10.1","items":[]}';
-        $layout = Layout::loadData($schema_data);
+        try {
+            $layout = Layout::loadData($schema_data);
+        } catch (Exception\IncompatibleLayout $e) {
+            $this->fail($e->getMessage());
+        }
 
-        $this->assertInstanceOf('Thinreports\Layout', $layout);
+        $this->assertNotNull($layout);
         $this->assertAttributeEquals(md5($schema_data), 'identifier', $layout);
     }
 
-    function test_parse()
+    public function test_parse(): void
     {
         try {
             Layout::parse('{"version":"0.8.1"}');
@@ -44,12 +54,16 @@ class LayoutTest extends TestCase
             // OK
         }
 
-        $schema = Layout::parse('{"version":"0.9.0", "items":[]}');
+        try {
+            $schema = Layout::parse('{"version":"0.9.0", "items":[]}');
+        } catch (Exception\IncompatibleLayout $e) {
+            $this->fail($e->getMessage());
+        }
 
         $this->assertSame(array('version' => '0.9.0', 'items' => array()), $schema);
     }
 
-    function test_initialize()
+    public function test_initialize(): void
     {
         $schema = array(
             'version' => '0.10.1',
@@ -81,7 +95,7 @@ class LayoutTest extends TestCase
         );
     }
 
-    function test_hasItemById()
+    public function test_hasItemById(): void
     {
         $item_schemas = array(
             array('id' => 'foo', 'type' => 'rect'),
@@ -93,7 +107,7 @@ class LayoutTest extends TestCase
         $this->assertFalse($layout->hasItemById('unknown'));
     }
 
-    function test_createItem()
+    public function test_createItem(): void
     {
         $this->markTestSkipped('Item classes are not supported yet.');
 
@@ -161,7 +175,7 @@ class LayoutTest extends TestCase
      *      Layout::getPageSize
      *      Layout::getSVG
      */
-    function test_schema_attribute_getters()
+    public function test_schema_attribute_getters(): void
     {
         $schema = array(
             'version' => '0.10.1',
@@ -199,20 +213,20 @@ class LayoutTest extends TestCase
         $this->assertEquals(array(100.9, 999.9), $layout->getPageSize());
     }
 
-    function test_getIdentifier()
+    public function test_getIdentifier(): void
     {
         $layout = new Layout(array('items' => array()), 'identifier');
         $this->assertEquals('identifier', $layout->getIdentifier());
     }
 
-    function test_getSchema()
+    public function test_getSchema(): void
     {
         $schema = array('version' => '0.10.1', 'items' => array());
         $layout = new Layout($schema, 'identifier');
         $this->assertSame($schema, $layout->getSchema());
     }
 
-    function test_getItemSchemas()
+    public function test_getItemSchemas(): void
     {
         $item_schemas = array(
             array('id' => 'text1', 'type' => 'text-block'),

@@ -9,12 +9,13 @@
 
 namespace Thinreports;
 
+use Thinreports\Exception\StandardException;
 use Thinreports\Page;
 use Thinreports\Generator;
 
 class Report
 {
-    private $default_layout = null;
+    private $default_layout;
     private $layouts = array();
 
     private $pages = array();
@@ -24,7 +25,7 @@ class Report
     /**
      * @param string|null $default_layout_filename
      */
-    public function __construct($default_layout_filename = null)
+    public function __construct(string $default_layout_filename = null)
     {
         if ($default_layout_filename !== null) {
             $this->default_layout = $this->buildLayout($default_layout_filename);
@@ -46,8 +47,9 @@ class Report
      *
      *  # Use default layout, don't count number of pages
      *  $page->addPage(null, false);
+     * @throws StandardException
      */
-    public function addPage($layout_filename = null, $countable = true)
+    public function addPage(string $layout_filename = null, bool $countable = true): Page\Page
     {
         $layout = $this->loadLayout($layout_filename);
         $page_number = $this->getNextPageNumber($countable);
@@ -59,10 +61,10 @@ class Report
     }
 
     /**
-     * @param boolean $countable
+     * @param bool $countable
      * @return Page\BlankPage
      */
-    public function addBlankPage($countable = true)
+    public function addBlankPage(bool $countable = true): Page\BlankPage
     {
         $page_number = $this->getNextPageNumber($countable);
 
@@ -73,33 +75,33 @@ class Report
     }
 
     /**
-     * @return integer
+     * @return int
      */
-    public function getPageCount()
+    public function getPageCount(): int
     {
         return $this->page_count;
     }
 
     /**
-     * @return integer
+     * @return int
      */
-    public function getLastPageNumber()
+    public function getLastPageNumber(): int
     {
         return ($this->start_page_number - 1) + $this->page_count;
     }
 
     /**
-     * @param integer $number
+     * @param int $number
      */
-    public function startPageNumberFrom($number)
+    public function startPageNumberFrom(int $number): void
     {
         $this->start_page_number = $number;
     }
 
     /**
-     * @return integer
+     * @return int
      */
-    public function getStartPageNumber()
+    public function getStartPageNumber(): int
     {
         return $this->start_page_number;
     }
@@ -107,7 +109,7 @@ class Report
     /**
      * @return (Page\Page|Page\BlankPage)[]
      */
-    public function getPages()
+    public function getPages(): array
     {
         return $this->pages;
     }
@@ -117,15 +119,15 @@ class Report
      *
      * @return boolean|string
      */
-    public function generate($filename = null)
+    public function generate(string $filename = null)
     {
         $pdf_data = Generator\PDFGenerator::generate($this);
 
         if ($filename === null) {
             return $pdf_data;
-        } else {
-            return file_put_contents($filename, $pdf_data) !== false;
         }
+
+        return file_put_contents($filename, $pdf_data) !== false;
     }
 
     /**
@@ -133,7 +135,7 @@ class Report
      *
      * @return Layout
      */
-    public function getDefaultLayout()
+    public function getDefaultLayout(): Layout
     {
         return $this->default_layout;
     }
@@ -141,17 +143,17 @@ class Report
     /**
      * @access private
      *
-     * @param boolean $count
+     * @param bool $count
      * @return integer|null
      */
-    private function getNextPageNumber($count = true)
+    private function getNextPageNumber(bool $count = true): ?int
     {
         if ($count) {
             $this->page_count ++;
             return ($this->start_page_number - 1) + $this->page_count;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -159,8 +161,9 @@ class Report
      *
      * @param string|null $layout_filename
      * @return Layout
+     * @throws StandardException
      */
-    public function loadLayout($layout_filename = null)
+    public function loadLayout(string $layout_filename = null): Layout
     {
         if ($layout_filename !== null) {
             return $this->buildLayout($layout_filename);
@@ -168,9 +171,9 @@ class Report
 
         if ($this->default_layout === null) {
             throw new Exception\StandardException('Layout Not Specified');
-        } else {
-            return $this->default_layout;
         }
+
+        return $this->default_layout;
     }
 
     /**
@@ -178,8 +181,9 @@ class Report
      *
      * @param string $layout_filename
      * @return Layout
+     * @throws StandardException
      */
-    public function buildLayout($layout_filename)
+    public function buildLayout(string $layout_filename): Layout
     {
         if (!array_key_exists($layout_filename, $this->layouts)) {
             $this->layouts[$layout_filename] = Layout::loadFile($layout_filename);
