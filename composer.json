@@ -22,7 +22,8 @@
   "require-dev": {
     "phpunit/phpunit": "^8",
     "symfony/yaml": "~2.7",
-    "smalot/pdfparser": "~0.9"
+    "smalot/pdfparser": "~0.9",
+    "phpstan/phpstan": "^1.11"
   },
   "autoload": {
     "psr-4": { "Thinreports\\": "src/Thinreports" }
@@ -31,6 +32,7 @@
     "psr-4": { "Thinreports\\": "test/unit/Thinreports" }
   },
   "scripts": {
-    "test": "phpunit"
+    "test": "phpunit",
+    "phpstan": "./vendor/bin/phpstan analyse --memory-limit=1G"
   }
 }
