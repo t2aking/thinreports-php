@@ -1,15 +1,26 @@
 <?php
+
+use Thinreports\Exception\StandardException;
+
 require_once __DIR__ . '/../test_helper.php';
 
 class ImageRenderingFeature extends FeatureTest
 {
-    function test_imageRendering()
+    public function test_imageRendering(): void
     {
         $report = new Thinreports\Report(__DIR__ . '/layouts/images.tlf');
-        $page = $report->addPage();
+        try {
+            $page = $report->addPage();
+        } catch (StandardException $e) {
+            $this->fail($e->getMessage());
+        }
 
-        $page('image_jpeg')->setSource(__DIR__ . '/files/image-block-jpeg.jpg');
-        $page('image_png')->setSource(__DIR__ . '/files/image-block-png.png');
+        try {
+            $page('image_jpeg')->setSource(__DIR__ . '/files/image-block-jpeg.jpg');
+            $page('image_png')->setSource(__DIR__ . '/files/image-block-png.png');
+        } catch (StandardException $e) {
+            $this->fail($e->getMessage());
+        }
 
         $analyzer = $this->analyzePDF($report->generate());
 
