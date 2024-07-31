@@ -128,7 +128,7 @@ class Page extends BlankPage
     /**
      * @access private
      *
-     * @return Thinreports\Item\AbstractItem[]
+     * @return AbstractItem[]
      * @throws StandardException
      */
     public function getFinalizedItems(): array

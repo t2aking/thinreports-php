@@ -66,7 +66,7 @@ class Document
     /**
      * @param Layout $layout
      */
-    public function addPage(Layout $layout)
+    public function addPage(Layout $layout): void
     {
         $page_format = $this->registerPageFormat($layout);
         $this->pdf->AddPage($page_format['orientation'], $page_format['size']);
@@ -74,7 +74,7 @@ class Document
         $this->last_page_layout = $layout;
     }
 
-    public function addBlankPage()
+    public function addBlankPage(): void
     {
         if ($this->last_page_layout !== null) {
             $page_format = $this->getRegisteredPageFormat($this->last_page_layout->getIdentifier());
@@ -87,7 +87,7 @@ class Document
     /**
      * @return string PDF data
      */
-    public function render()
+    public function render(): string
     {
         return $this->pdf->getPDFData();
     }
@@ -96,7 +96,7 @@ class Document
      * @param Layout $layout
      * @return array
      */
-    public function buildPageFormat(Layout $layout)
+    public function buildPageFormat(Layout $layout): array
     {
         $orientation = $layout->isPortraitPage() ? 'P' : 'L';
 
@@ -132,7 +132,7 @@ class Document
      * @param Layout $layout
      * @return array
      */
-    public function registerPageFormat(Layout $layout)
+    public function registerPageFormat(Layout $layout): array
     {
         $layout_identifier = $layout->getIdentifier();
 
@@ -146,12 +146,12 @@ class Document
      * @param string $layout_identifier
      * @return array
      */
-    public function getRegisteredPageFormat($layout_identifier)
+    public function getRegisteredPageFormat(string $layout_identifier): array
     {
         return $this->page_formats[$layout_identifier];
     }
 
-    public function initDrawer()
+    public function initDrawer(): void
     {
         $this->graphics = new Graphics($this->pdf);
         $this->text     = new Text($this->pdf);

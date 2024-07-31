@@ -318,9 +318,9 @@ class GraphicsTest extends TestCase
     {
         $test_graphics = new Graphics($this->tcpdf);
 
-        $this->assertEquals('DF', $test_graphics->buildRenderingFlag(array('width' => 1), 'ffffff'));
+        $this->assertEquals('DF', $test_graphics->buildRenderingFlag(array('width' => 1), []));
         $this->assertEquals('D',  $test_graphics->buildRenderingFlag(array('width' => 1), null));
-        $this->assertEquals('F',  $test_graphics->buildRenderingFlag(null, 'ffffff'));
+        $this->assertEquals('F',  $test_graphics->buildRenderingFlag(null, []));
     }
 
     function test_buildImagePosition()

@@ -8,13 +8,13 @@ class ColorParserTest extends TestCase
     /**
      * @dataProvider colorPatternProvider
      */
-    function test_parse($expected_result, $color)
+    public function test_parse($expected_result, $color): void
     {
         $actual = ColorParser::parse($color);
         $this->assertSame($expected_result, $actual);
     }
 
-    function colorPatternProvider()
+    public function colorPatternProvider(): array
     {
         return array(
             array(null, ''),

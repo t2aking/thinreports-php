@@ -9,6 +9,7 @@
 
 namespace Thinreports\Generator\Renderer;
 
+use Thinreports\Exception\StandardException;
 use Thinreports\Layout;
 use Thinreports\Generator\PDF;
 use Thinreports\Exception;
@@ -18,7 +19,7 @@ use Thinreports\Exception;
  */
 class LayoutRenderer extends AbstractRenderer
 {
-    private $items = array();
+    private $items;
 
     /**
      * @param PDF\Document $doc
@@ -34,7 +35,7 @@ class LayoutRenderer extends AbstractRenderer
      * @param Layout $layout
      * @return array()
      */
-    public function parse(Layout $layout)
+    public function parse(Layout $layout): array
     {
         $items = array();
         $text_lines = array();
@@ -60,7 +61,10 @@ class LayoutRenderer extends AbstractRenderer
         return $items;
     }
 
-    public function render()
+    /**
+     * @throws StandardException
+     */
+    public function render(): void
     {
         foreach ($this->items as $attributes) {
             $type_name = $attributes['type'];
@@ -91,7 +95,7 @@ class LayoutRenderer extends AbstractRenderer
     /**
      * @param array $attrs
      */
-    public function renderText(array $attrs)
+    public function renderText(array $attrs): void
     {
         $styles = $this->buildTextStyles($attrs['style']);
 
@@ -120,7 +124,7 @@ class LayoutRenderer extends AbstractRenderer
     /**
      * @param array $attrs
      */
-    public function renderRect(array $attrs)
+    public function renderRect(array $attrs): void
     {
         $styles = $this->buildGraphicStyles($attrs['style']);
         $styles['radius'] = $attrs['border-radius'];
@@ -137,7 +141,7 @@ class LayoutRenderer extends AbstractRenderer
     /**
      * @param array $attrs
      */
-    public function renderEllipse(array $attrs)
+    public function renderEllipse(array $attrs): void
     {
         $this->doc->graphics->drawEllipse(
             $attrs['cx'],
@@ -151,7 +155,7 @@ class LayoutRenderer extends AbstractRenderer
     /**
      * @param array $attrs
      */
-    public function renderLine(array $attrs)
+    public function renderLine(array $attrs): void
     {
         $this->doc->graphics->drawLine(
             $attrs['x1'],
@@ -165,7 +169,7 @@ class LayoutRenderer extends AbstractRenderer
     /**
      * @param array $attrs
      */
-    public function renderImage(array $attrs)
+    public function renderImage(array $attrs): void
     {
         $this->doc->graphics->drawBase64Image(
             $attrs['data']['base64'],

@@ -5,12 +5,12 @@ use Thinreports\TestCase;
 
 class FontTest extends TestCase
 {
-    function setup()
+    public function setup(): void
     {
         Font::$installed_builtin_fonts = array();
     }
 
-    function test_build()
+    public function test_build(): void
     {
         Font::build();
 
@@ -25,7 +25,7 @@ class FontTest extends TestCase
         );
     }
 
-    function test_getFontName()
+    public function test_getFontName(): void
     {
         $this->assertEquals('Helvetica', Font::getFontName('Helvetica'));
 
@@ -46,14 +46,14 @@ class FontTest extends TestCase
     /**
      * @dataProvider unicodeFontProvider
      */
-    function test_installBuiltinFont($expected_result, $font_name)
+    public function test_installBuiltinFont($expected_result, $font_name): void
     {
         $actual = Font::installBuiltinFont($font_name);
 
         $this->assertEquals($expected_result, $actual);
         $this->assertContains($actual, Font::$installed_builtin_fonts);
     }
-    function unicodeFontProvider()
+    public function unicodeFontProvider(): array
     {
         return array(
             array('ipam', 'IPAMincho'),
@@ -63,14 +63,14 @@ class FontTest extends TestCase
         );
     }
 
-    function test_isBuiltinUnicodeFont()
+    public function test_isBuiltinUnicodeFont(): void
     {
         $this->assertFalse(Font::isBuiltinUnicodeFont('unknown font'));
         $this->assertFalse(Font::isBuiltinUnicodeFont('Helvetica'));
         $this->assertTrue(Font::isBuiltinUnicodeFont('IPAGothic'));
     }
 
-    function test_isInstalledFont()
+    public function test_isInstalledFont(): void
     {
         $this->assertFalse(Font::isInstalledFont('IPAMincho'));
         Font::$installed_builtin_fonts['IPAMincho'] = 'ipam';

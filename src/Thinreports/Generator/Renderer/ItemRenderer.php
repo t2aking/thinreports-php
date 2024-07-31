@@ -19,7 +19,7 @@ class ItemRenderer extends AbstractRenderer
     /**
      * @param Item\AbstractItem $item
      */
-    public function render(Item\AbstractItem $item)
+    public function render(Item\AbstractItem $item): void
     {
         if (!$this->isRenderable($item)) {
             return;
@@ -43,9 +43,9 @@ class ItemRenderer extends AbstractRenderer
 
     /**
      * @param Item\AbstractItem $item
-     * @return boolean
+     * @return bool
      */
-    public function isRenderable(Item\AbstractItem $item)
+    public function isRenderable(Item\AbstractItem $item): bool
     {
         if (!$item->isVisible()) {
             return false;
@@ -71,7 +71,7 @@ class ItemRenderer extends AbstractRenderer
     /**
      * @param Item\BasicItem $item
      */
-    public function renderBasicItem(Item\BasicItem $item)
+    public function renderBasicItem(Item\BasicItem $item): void
     {
         switch (true) {
             case $item->isImage():
@@ -95,7 +95,7 @@ class ItemRenderer extends AbstractRenderer
     /**
      * @param Item\TextBlockItem $item
      */
-    public function renderTextBlockItem(Item\TextBlockItem $item)
+    public function renderTextBlockItem(Item\TextBlockItem $item): void
     {
         $schema = $item->getSchema();
         $bounds = $item->getBounds();
@@ -134,7 +134,7 @@ class ItemRenderer extends AbstractRenderer
     /**
      * @param Item\ImageBlockItem $item
      */
-    public function renderImageBlockItem(Item\ImageBlockItem $item)
+    public function renderImageBlockItem(Item\ImageBlockItem $item): void
     {
         $bounds = $item->getBounds();
         $styles = $this->buildImageBoxItemStyles($item);
@@ -152,7 +152,7 @@ class ItemRenderer extends AbstractRenderer
     /**
      * @param Item\PageNumberItem $item
      */
-    public function renderPageNumberItem(Item\PageNumberItem $item)
+    public function renderPageNumberItem(Item\PageNumberItem $item): void
     {
         $bounds = $item->getBounds();
 
@@ -169,7 +169,7 @@ class ItemRenderer extends AbstractRenderer
     /**
      * @param Item\BasicItem $item
      */
-    public function renderImageItem(Item\BasicItem $item)
+    public function renderImageItem(Item\BasicItem $item): void
     {
         $schema = $item->getSchema();
         $bounds = $item->getBounds();
@@ -186,7 +186,7 @@ class ItemRenderer extends AbstractRenderer
     /**
      * @param Item\BasicItem $item
      */
-    public function renderTextItem(Item\BasicItem $item)
+    public function renderTextItem(Item\BasicItem $item): void
     {
         $schema = $item->getSchema();
         $bounds = $item->getBounds();
@@ -204,13 +204,13 @@ class ItemRenderer extends AbstractRenderer
     /**
      * @param Item\BasicItem $item
      */
-    public function renderRectItem(Item\BasicItem $item)
+    public function renderRectItem(Item\BasicItem $item): void
     {
-        $schema = $item->getSchema();
+//        $schema = $item->getSchema();
         $bounds = $item->getBounds();
 
-        $styles = $this->buildGraphicStyles($schema);
-        $styles['radius'] = $schema['border-radius'];
+//        $styles = $this->buildGraphicStyles($schema);
+//        $styles['radius'] = $schema['border-radius'];
 
         $this->doc->graphics->drawRect(
             $bounds['x'],
@@ -224,7 +224,7 @@ class ItemRenderer extends AbstractRenderer
     /**
      * @param Item\BasicItem $item
      */
-    public function renderEllipseItem(Item\BasicItem $item)
+    public function renderEllipseItem(Item\BasicItem $item): void
     {
         $bounds = $item->getBounds();
 
@@ -240,7 +240,7 @@ class ItemRenderer extends AbstractRenderer
     /**
      * @param Item\BasicItem $item
      */
-    public function renderLineItem(Item\BasicItem $item)
+    public function renderLineItem(Item\BasicItem $item): void
     {
         $bounds = $item->getBounds();
 
@@ -249,7 +249,7 @@ class ItemRenderer extends AbstractRenderer
             $bounds['y1'],
             $bounds['x2'],
             $bounds['y2'],
-            $this->normalizeGraphicStyles($item->exportStyles())
+            $this->buildGraphicStyles($item->exportStyles())
         );
     }
 
@@ -257,7 +257,7 @@ class ItemRenderer extends AbstractRenderer
      * @param Item\ImageBlockItem $item
      * @return array
      */
-    public function buildImageBoxItemStyles(Item\ImageBlockItem $item)
+    public function buildImageBoxItemStyles(Item\ImageBlockItem $item): array
     {
         $schema = $item->getSchema();
 

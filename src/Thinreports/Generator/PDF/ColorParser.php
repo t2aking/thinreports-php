@@ -34,12 +34,12 @@ class ColorParser
     );
 
     /**
-     * @param string $hex_or_name
+     * @param string|null $hex_or_name
      * @return string[]|null
      */
-    static public function parse($hex_or_name)
+    public static function parse(?string $hex_or_name): ?array
     {
-        if ($hex_or_name === null || $hex_or_name == '') {
+        if (empty($hex_or_name)) {
             return null;
         }
 
@@ -55,9 +55,9 @@ class ColorParser
      * @param string $hex_color
      * @return string[]
      */
-    static private function hexToRgb($hex_color)
+    private static function hexToRgb(string $hex_color): array
     {
-        $converter = function ($hex) {
+        $converter = static function ($hex) {
             return hexdec($hex);
         };
         return array_map($converter, str_split($hex_color, 2));

@@ -56,7 +56,7 @@ class Graphics
      * }
      * @see http://www.tcpdf.org/doc/code/classTCPDF.html
      */
-    public function drawLine($x1, $y1, $x2, $y2, array $attrs = array())
+    public function drawLine($x1, $y1, $x2, $y2, array $attrs = array()): void
     {
         $style = $this->buildGraphicStyles($attrs);
 
@@ -81,7 +81,7 @@ class Graphics
      * }
      * @see http://www.tcpdf.org/doc/code/classTCPDF.html
      */
-    public function drawRect($x, $y, $width, $height, array $attrs = array())
+    public function drawRect($x, $y, $width, $height, array $attrs = array()): void
     {
         $style = $this->buildGraphicStyles($attrs);
         $rendering_flag = $this->buildRenderingFlag($style['stroke'], $style['fill']);
@@ -108,7 +108,7 @@ class Graphics
      * }
      * @see http://www.tcpdf.org/doc/code/classTCPDF.html
      */
-    public function drawEllipse($cx, $cy, $rx, $ry, array $attrs = array())
+    public function drawEllipse($cx, $cy, $rx, $ry, array $attrs = array()): void
     {
         $style = $this->buildGraphicStyles($attrs);
         $rendering_flag = $this->buildRenderingFlag($style['stroke'], $style['fill']);
@@ -129,7 +129,7 @@ class Graphics
      * }
      * @see http://www.tcpdf.org/doc/code/classTCPDF.html
      */
-    public function drawImage($filename, $x, $y, $width, $height, array $attrs = array())
+    public function drawImage($filename, $x, $y, $width, $height, array $attrs = array()): void
     {
         $position = $this->buildImagePosition($attrs);
 
@@ -160,7 +160,7 @@ class Graphics
      * @param float|string $height
      * @param array $attrs {@see self::drawImage()}
      */
-    public function drawBase64Image($base64_string, $x, $y, $width, $height, array $attrs = array())
+    public function drawBase64Image($base64_string, $x, $y, $width, $height, array $attrs = array()): void
     {
         $registry_key = md5($base64_string);
         $image_path = $this->getRegisteredImagePath($registry_key);
@@ -174,7 +174,7 @@ class Graphics
         $this->drawImage($image_path, $x, $y, $width, $height, $attrs);
     }
 
-    public function clearRegisteredImages()
+    public function clearRegisteredImages(): void
     {
         foreach ($this->image_registry as $image_path) {
             unlink($image_path);
@@ -185,9 +185,9 @@ class Graphics
      * @param array $attrs
      * @return array {@example array("stroke" => array("attr" => "value"), "fill" => "fill_color"))
      */
-    public function buildGraphicStyles(array $attrs)
+    public function buildGraphicStyles(array $attrs): array
     {
-        if (empty($attrs['stroke_width']) || $attrs['stroke_color'] == 'none') {
+        if (empty($attrs['stroke_width']) || $attrs['stroke_color'] === 'none') {
             $stroke_style = null;
         } else {
             $stroke_color = ColorParser::parse($attrs['stroke_color']);
@@ -219,7 +219,7 @@ class Graphics
      * @param array|null $fill
      * @return string
      */
-    public function buildRenderingFlag($stroke, $fill)
+    public function buildRenderingFlag(?array $stroke, ?array $fill): string
     {
         $flag = array();
 
@@ -230,27 +230,23 @@ class Graphics
             $flag[] = 'F';
         }
 
-        return join('', $flag);
+        return implode('', $flag);
     }
 
     /**
      * @param string $registry_key
      * @return string|null
      */
-    public function getRegisteredImagePath($registry_key)
+    public function getRegisteredImagePath(string $registry_key): ?string
     {
-        if (array_key_exists($registry_key, $this->image_registry)) {
-            return $this->image_registry[$registry_key];
-        } else {
-            return null;
-        }
+        return $this->image_registry[$registry_key] ?? null;
     }
 
     /**
      * @param array $attrs
      * @return string
      */
-    public function buildImagePosition(array $attrs)
+    public function buildImagePosition(array $attrs): string
     {
         $align  = array_key_exists('align', $attrs)  ? $attrs['align']  : 'left';
         $valign = array_key_exists('valign', $attrs) ? $attrs['valign'] : 'top';
