@@ -7,14 +7,14 @@ class GraphicsTest extends TestCase
 {
     private $tcpdf;
 
-    function setup()
+    public function setup(): void
     {
         $this->tcpdf = $this->getMockBuilder('TCPDF')
                             ->setMethods(array('Line', 'Rect', 'RoundedRect', 'Image', 'Ellipse'))
                             ->getMock();
     }
 
-    function test_drawLine()
+    public function test_drawLine(): void
     {
         $this->tcpdf->expects($this->once())
                     ->method('Line')
@@ -70,7 +70,7 @@ class GraphicsTest extends TestCase
         );
     }
 
-    function test_drawRect()
+    public function test_drawRect(): void
     {
         $this->tcpdf->expects($this->once())
                     ->method('Rect')
@@ -137,7 +137,7 @@ class GraphicsTest extends TestCase
         );
     }
 
-    function test_drawEllipse()
+    public function test_drawEllipse(): void
     {
         $this->tcpdf->expects($this->once())
                     ->method('Ellipse')
@@ -172,7 +172,7 @@ class GraphicsTest extends TestCase
         );
     }
 
-    function test_drawImage()
+    public function test_drawImage(): void
     {
         $this->tcpdf->expects($this->once())
                     ->method('Image')
@@ -208,7 +208,7 @@ class GraphicsTest extends TestCase
         );
     }
 
-    function test_drawBase64Image()
+    public function test_drawBase64Image(): void
     {
         $base64_image = file_get_contents($this->dataDir() . '/image.png.base64');
         $base64_image_key = md5($base64_image);
@@ -252,7 +252,7 @@ class GraphicsTest extends TestCase
     /**
      * @dataProvider graphicStyleProvider
      */
-    function test_buildGraphicStyles($expected_result, $attrs)
+    public function test_buildGraphicStyles($expected_result, $attrs): void
     {
         $test_graphics = new Graphics($this->tcpdf);
 
@@ -261,7 +261,7 @@ class GraphicsTest extends TestCase
             $test_graphics->buildGraphicStyles($attrs)
         );
     }
-    function graphicStyleProvider()
+    public function graphicStyleProvider(): array
     {
         return array(
             array(
@@ -314,7 +314,7 @@ class GraphicsTest extends TestCase
         );
     }
 
-    function test_buildRenderingFlag()
+    public function test_buildRenderingFlag(): void
     {
         $test_graphics = new Graphics($this->tcpdf);
 
@@ -323,7 +323,7 @@ class GraphicsTest extends TestCase
         $this->assertEquals('F',  $test_graphics->buildRenderingFlag(null, []));
     }
 
-    function test_buildImagePosition()
+    public function test_buildImagePosition(): void
     {
         $test_graphics = new Graphics($this->tcpdf);
 
