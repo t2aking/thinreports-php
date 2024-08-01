@@ -9,6 +9,7 @@ class ImageRenderingFeature extends FeatureTest
     public function test_imageRendering(): void
     {
         $report = new Thinreports\Report(__DIR__ . '/layouts/images.tlf');
+        $page = null;
         try {
             $page = $report->addPage();
         } catch (StandardException $e) {

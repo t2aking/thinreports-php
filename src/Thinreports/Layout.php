@@ -279,13 +279,12 @@ class Layout
         switch ($filter) {
             case 'all':
                 return $this->schema['items'];
-                break;
             case 'with_id':
                 return $this->item_schemas['with_id'];
-                break;
             case 'without_id':
                 return $this->item_schemas['without_id'];
-                break;
+            default:
+                return [];
         }
     }
 }

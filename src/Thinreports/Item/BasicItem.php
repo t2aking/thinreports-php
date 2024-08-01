@@ -109,7 +109,6 @@ class BasicItem extends AbstractItem
                     'width'  => $schema['width'],
                     'height' => $schema['height']
                 );
-                break;
             case $this->isEllipse():
                 return array(
                     'cx' => $schema['cx'],
@@ -117,7 +116,6 @@ class BasicItem extends AbstractItem
                     'rx' => $schema['rx'],
                     'ry' => $schema['ry']
                 );
-                break;
             case $this->isLine():
                 return array(
                     'x1' => $schema['x1'],
@@ -125,7 +123,8 @@ class BasicItem extends AbstractItem
                     'x2' => $schema['x2'],
                     'y2' => $schema['y2']
                 );
-                break;
+            default:
+                return [];
         }
     }
 }
