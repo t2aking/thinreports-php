@@ -209,4 +209,24 @@ class ReportTest extends TestCase
         $this->assertAttributeCount(1, 'layouts', $report);
         $this->assertSame($layout1st, $layout2nd);
     }
+
+    public function test_generateReturnsPdfDataWhenFilenameIsNull(): void
+    {
+        $report = $this->createReport($this->dataLayoutFile('empty_A4P.tlf'));
+        $pdf_data = $report->generate();
+
+        $this->assertNotNull($pdf_data);
+    }
+
+    public function test_generateWritesPdfToFileWhenFilenameIsProvided(): void
+    {
+        $report = $this->createReport($this->dataLayoutFile('empty_A4P.tlf'));
+        $filename = 'test.pdf';
+        $report->generate($filename);
+
+        $this->assertTrue($report->generate($filename) > 0);
+        $this->assertFileExists($filename);
+
+        unlink($filename);
+    }
 }
