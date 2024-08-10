@@ -137,6 +137,53 @@ class TextFormatterTest extends TestCase
         ));
 
         $this->assertEquals('(  999)', $formatter->format(999));
+
+        $formatter = new TextFormatter(array(
+            'type' => 'padding',
+            'padding' => array(
+                'direction' => 'L',
+                'char' => '',
+                'length' => 5
+            ),
+            'base' => ''
+        ));
+
+        $this->assertEquals('999', $formatter->format(999));
+
+        $formatter = new TextFormatter(array(
+            'type' => 'padding',
+            'padding' => array(
+                'direction' => 'L',
+                'length' => 5
+            ),
+            'base' => ''
+        ));
+
+        $this->assertEquals('999', $formatter->format(999));
+
+        $formatter = new TextFormatter(array(
+            'type' => 'padding',
+            'padding' => array(
+                'direction' => 'L',
+                'char' => null,
+                'length' => 5
+            ),
+            'base' => ''
+        ));
+
+        $this->assertEquals('999', $formatter->format(999));
+
+        $formatter = new TextFormatter(array(
+            'type' => 'padding',
+            'padding' => array(
+                'direction' => 'L',
+                'char' => ' ',
+                'length' => 0
+            ),
+            'base' => ''
+        ));
+
+        $this->assertEquals('999', $formatter->format(999));
     }
 
     public function test_format(): void
@@ -166,5 +213,12 @@ class TextFormatterTest extends TestCase
         ));
 
         $this->assertEquals('あいう', $formatter->format('い'));
+
+        $formatter = new TextFormatter(array(
+            'type' => '',
+            'base' => 'あ'
+        ));
+
+        $this->assertEquals('い', $formatter->format('い'));
     }
 }
