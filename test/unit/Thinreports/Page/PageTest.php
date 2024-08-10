@@ -2,6 +2,7 @@
 namespace Thinreports\Page;
 
 use Thinreports\Exception\StandardException;
+use Thinreports\Item\PageNumberItem;
 use Thinreports\TestCase;
 use Thinreports\Report;
 use Thinreports\Layout;
@@ -22,6 +23,7 @@ class PageTest extends TestCase
         $this->item_schemas = $this->dataItemFormats(array(
             array('text_block', 'default'),
             array('image_block', 'default'),
+            array('page_number', 'default'),
             array('text', 'default')
         ));
 
@@ -69,10 +71,12 @@ class PageTest extends TestCase
             $page->item('text_block_default'));
         $this->assertInstanceOf(ImageBlockItem::class,
             $page->item('image_block_default'));
+        $this->assertInstanceOf(PageNumberItem::class,
+            $page->item('page_number_default'));
         $this->assertInstanceOf(BasicItem::class,
             $page->item('text_default'));
 
-        $this->assertAttributeCount(3, 'items', $page);
+        $this->assertAttributeCount(4, 'items', $page);
     }
 
     /**
@@ -146,6 +150,7 @@ class PageTest extends TestCase
 
         $this->assertTrue($page->hasItem('text_block_default'));
         $this->assertTrue($page->hasItem('image_block_default'));
+        $this->assertTrue($page->hasItem('page_number_default'));
         $this->assertTrue($page->hasItem('text_default'));
 
         $this->assertFalse($page->hasItem('unknown_id'));
@@ -175,6 +180,7 @@ class PageTest extends TestCase
         $expects = array(
             new Item\TextBlockItem($page, $this->item_schemas['text_block_default']),
             new Item\ImageBlockItem($page, $this->item_schemas['image_block_default']),
+            new Item\PageNumberItem($page, $this->item_schemas['page_number_default']),
             new Item\BasicItem($page, $this->item_schemas['text_default'])
         );
         $this->assertEquals($expects, $page->getFinalizedItems());

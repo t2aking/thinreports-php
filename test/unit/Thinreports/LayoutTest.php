@@ -23,6 +23,14 @@ class LayoutTest extends TestCase
         }
 
         $this->assertNotNull($layout);
+
+        try {
+            $layout = Layout::loadFile($this->dataLayoutFile('empty_A4P'));
+        } catch (StandardException $e) {
+            $this->fail($e->getMessage());
+        }
+
+        $this->assertNotNull($layout);
     }
 
     public function test_loadData(): void
@@ -61,6 +69,44 @@ class LayoutTest extends TestCase
         }
 
         $this->assertSame(array('version' => '0.9.0', 'items' => array()), $schema);
+
+        try {
+            $schema = Layout::parse('{"version":"0.9.0", "items":[{"id": "", "type": "image", "x": 0.0, "y": 0.0, "width": 592.6, "height": 764.5, "display": true}]}');
+        } catch (Exception\IncompatibleLayout $e) {
+            $this->fail($e->getMessage());
+        }
+
+        $items = [
+            [
+                'id' => '',
+                'type' => 'image',
+                'x' => 0.0,
+                'y' => 0.0,
+                'width' => 592.6,
+                'height' => 764.5,
+                'display' => true
+            ]
+        ];
+        $this->assertSame(array('version' => '0.9.0', 'items' => $items), $schema);
+
+        try {
+            $schema = Layout::parse('{"version":"0.9.0", "items":[{"id": "test_id", "type": "image", "x": 0.0, "y": 0.0, "width": 592.6, "height": 764.5, "display": true}]}');
+        } catch (Exception\IncompatibleLayout $e) {
+            $this->fail($e->getMessage());
+        }
+
+        $items = [
+            'test_id' => [
+                'id' => 'test_id',
+                'type' => 'image',
+                'x' => 0.0,
+                'y' => 0.0,
+                'width' => 592.6,
+                'height' => 764.5,
+                'display' => true
+            ]
+        ];
+        $this->assertSame(array('version' => '0.9.0', 'items' => $items), $schema);
     }
 
     public function test_initialize(): void
@@ -244,6 +290,10 @@ class LayoutTest extends TestCase
         $this->assertEquals(
             array(array('id' => '', 'type' => 'rect')),
             $layout->getItemSchemas('without_id')
+        );
+        $this->assertEquals(
+            array(),
+            $layout->getItemSchemas('unknown')
         );
     }
 }
