@@ -91,6 +91,11 @@ class BasicItemTest extends TestCase
             'x2' => $item_schema['x2'],
             'y2' => $item_schema['y2']
         ), $item->getBounds());
+
+        $item = $this->newBasicItem('text_block');
+        $item_schema = $this->dataItemFormat('text_block');
+
+        $this->assertEquals([], $item->getBounds());
     }
 
     public function test_isTypeOf(): void
