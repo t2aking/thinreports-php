@@ -108,6 +108,16 @@ class AbstractItemTest extends TestCase
         $this->assertEquals($item->style->export(), $item->exportStyles());
     }
 
+    public function test_clone(): void
+    {
+        $item = new TestGraphicsItem($this->page, $this->dataItemFormat('rect'));
+
+        $clonedItem = clone $item;
+
+        $this->assertSame($item->getStyle('border'), $clonedItem->getStyle('border'));
+        $this->assertEquals($item->getStyle('border_color'), $clonedItem->getStyle('border_color'));
+    }
+
     public function test_getParent(): void
     {
         $item = new TestItem($this->page, array('display' => true));

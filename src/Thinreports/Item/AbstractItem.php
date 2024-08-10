@@ -88,8 +88,6 @@ abstract class AbstractItem
      * @param string $name
      * @param mixed $style
      * @return $this
-     * @throws Thinreports\Exception\StandardException
-     * @throws Thinreports\Exception\UnavailableStyleValue
      */
     public function setStyle(string $name, $style): AbstractItem
     {
@@ -100,8 +98,6 @@ abstract class AbstractItem
     /**
      * @param array $styles
      * @return $this
-     * @throws Thinreports\Exception\StandardException
-     * @throws Thinreports\Exception\UnavailableStyleValue
      */
     public function setStyles(array $styles): AbstractItem
     {
@@ -113,7 +109,6 @@ abstract class AbstractItem
 
     /**
      * @return mixed
-     * @throws Thinreports\Exception\StandardException
      */
     public function getStyle($name)
     {
