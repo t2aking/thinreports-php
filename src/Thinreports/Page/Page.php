@@ -72,7 +72,7 @@ class Page extends BlankPage
         $item = $this->item($id);
 
         if (!$item->isTypeOf('block')) {
-            throw new Exception\StandardException('Undeniable Item', $id);
+            throw new Exception\StandardException('Uneditable Item', $id);
         }
         $item->setValue($value);
     }

@@ -111,7 +111,7 @@ class PageTest extends TestCase
             $page->setItemValue('text_default', 'content');
             $this->fail();
         } catch (Exception\StandardException $e) {
-            $this->assertEquals('Undeniable Item', $e->getSubject());
+            $this->assertEquals('Uneditable Item', $e->getSubject());
         }
 
         $page->setItemValue('text_block_default', 'value');
@@ -132,7 +132,7 @@ class PageTest extends TestCase
             $page->setItemValues(array('text_default' => 'value'));
             $this->fail();
         } catch (Exception\StandardException $e) {
-            $this->assertEquals('Undeniable Item', $e->getSubject());
+            $this->assertEquals('Uneditable Item', $e->getSubject());
         }
 
         $page->setItemValues(array(
