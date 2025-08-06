@@ -17,33 +17,33 @@ abstract class AbstractBlockItem extends AbstractItem
      * @param mixed $value
      * @return $this
      */
-    public function setValue($value)
+    public function setValue($value): AbstractBlockItem
     {
         $this->value = $value;
         return $this;
     }
 
     /**
-     * @return $mixed
+     * @return string|null
      */
-    public function getValue()
+    public function getValue(): ?string
     {
         return $this->value;
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         $value = $this->getValue();
         return $value === null || $value === '';
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isPresent()
+    public function isPresent(): bool
     {
         return !$this->isEmpty();
     }
@@ -51,7 +51,7 @@ abstract class AbstractBlockItem extends AbstractItem
     /**
      * {@inheritdoc}
      */
-    public function getBounds()
+    public function getBounds(): array
     {
         return array(
             'x' => $this->schema['x'],
@@ -64,7 +64,7 @@ abstract class AbstractBlockItem extends AbstractItem
     /**
      * {@inheritdoc}
      */
-    public function isTypeOf($type_name)
+    public function isTypeOf(string $type_name): bool
     {
         return $type_name === 'block' || parent::isTypeOf($type_name);
     }

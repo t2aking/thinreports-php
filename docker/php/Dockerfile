@@ -1,4 +1,4 @@
-FROM php:7.0-fpm
+FROM php:7.2-fpm
 COPY php.ini /usr/local/etc/php/
 
 RUN sed -i s/deb.debian.org\\/debian\ stretch-updates/archive.debian.org\\/debian\ stretch/g /etc/apt/sources.list
@@ -8,19 +8,7 @@ RUN sed -i s/security.debian.org\\/debian-security\ stretch/archive.debian.org\\
 RUN apt-get update \
     && apt-get install -y zip
 
-RUN BEFORE_PWD=$(pwd) \
-    && mkdir -p /opt/xdebug \
-    && cd /opt/xdebug \
-    && curl -k -L https://github.com/xdebug/xdebug/archive/XDEBUG_2_5_5.tar.gz | tar zx \
-    && cd xdebug-XDEBUG_2_5_5 \
-    && phpize \
-    && ./configure --enable-xdebug \
-    && make clean \
-    && sed -i 's/-O2/-O0/g' Makefile \
-    && make \
-    && make install \
-    && cd "${BEFORE_PWD}" \
-    && rm -r /opt/xdebug
+RUN pecl install xdebug-3.1.6
 RUN docker-php-ext-enable xdebug
 
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"

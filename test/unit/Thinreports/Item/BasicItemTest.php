@@ -4,40 +4,43 @@ namespace Thinreports\Item;
 use Thinreports\TestCase;
 use Thinreports\Report;
 use Thinreports\Page\Page;
+use Thinreports\Item\Style\BasicStyle;
+use Thinreports\Item\Style\TextStyle;
+use Thinreports\Item\Style\GraphicStyle;
 
 class BasicItemTest extends TestCase
 {
     private $page;
 
-    function setup()
+    public function setup(): void
     {
         $report = new Report($this->dataLayoutFile('empty_A4P.tlf'));
         $this->page = $report->addPage();
     }
 
-    private function newBasicItem($schema_data_name)
+    private function newBasicItem($schema_data_name): BasicItem
     {
         return new BasicItem($this->page, $this->dataItemFormat($schema_data_name));
     }
 
-    function test_initialize()
+    public function test_initialize(): void
     {
         $item = $this->newBasicItem('image');
-        $this->assertAttributeInstanceOf('Thinreports\Item\Style\BasicStyle',
+        $this->assertAttributeInstanceOf(BasicStyle::class,
             'style', $item);
 
         $item = $this->newBasicItem('text');
-        $this->assertAttributeInstanceOf('Thinreports\Item\Style\TextStyle',
+        $this->assertAttributeInstanceOf(TextStyle::class,
             'style', $item);
 
         foreach (array('line', 'rect', 'ellipse') as $schema_data_name) {
             $item = $this->newBasicItem($schema_data_name);
-            $this->assertAttributeInstanceOf('Thinreports\Item\Style\GraphicStyle',
+            $this->assertAttributeInstanceOf(GraphicStyle::class,
                 'style', $item);
         }
     }
 
-    function test_getBounds()
+    public function test_getBounds(): void
     {
         $item = $this->newBasicItem('image');
         $item_schema = $this->dataItemFormat('image');
@@ -88,9 +91,14 @@ class BasicItemTest extends TestCase
             'x2' => $item_schema['x2'],
             'y2' => $item_schema['y2']
         ), $item->getBounds());
+
+        $item = $this->newBasicItem('text_block');
+        $item_schema = $this->dataItemFormat('text_block');
+
+        $this->assertEquals([], $item->getBounds());
     }
 
-    function test_isTypeOf()
+    public function test_isTypeOf(): void
     {
         $item = $this->newBasicItem('rect');
 
@@ -98,7 +106,7 @@ class BasicItemTest extends TestCase
         $this->assertTrue($item->isTypeOf('rect'));
     }
 
-    function test_isImage()
+    public function test_isImage(): void
     {
         $item = $this->newBasicItem('image');
         $this->assertTrue($item->isImage());
@@ -106,7 +114,7 @@ class BasicItemTest extends TestCase
         $this->assertFalseIn(array('rect', 'ellipse', 'line', 'text'), 'isImage');
     }
 
-    function test_isText()
+    public function test_isText(): void
     {
         $item = $this->newBasicItem('text');
         $this->assertTrue($item->isText());
@@ -114,7 +122,7 @@ class BasicItemTest extends TestCase
         $this->assertFalseIn(array('rect', 'ellipse', 'line', 'image'), 'isText');
     }
 
-    function test_isRect()
+    public function test_isRect(): void
     {
         $item = $this->newBasicItem('rect');
         $this->assertTrue($item->isRect());
@@ -122,7 +130,7 @@ class BasicItemTest extends TestCase
         $this->assertFalseIn(array('ellipse', 'line', 'image', 'text'), 'isRect');
     }
 
-    function test_isEllipse()
+    public function test_isEllipse(): void
     {
         $item = $this->newBasicItem('ellipse');
         $this->assertTrue($item->isEllipse());
@@ -130,7 +138,7 @@ class BasicItemTest extends TestCase
         $this->assertFalseIn(array('rect', 'line', 'image', 'text'), 'isEllipse');
     }
 
-    function test_isLine()
+    public function test_isLine(): void
     {
         $item = $this->newBasicItem('line');
         $this->assertTrue($item->isLine());
@@ -138,7 +146,7 @@ class BasicItemTest extends TestCase
         $this->assertFalseIn(array('rect', 'ellipse', 'image', 'text'), 'isLine');
     }
 
-    private function assertFalseIn($schema_data_names, $method_name)
+    private function assertFalseIn($schema_data_names, $method_name): void
     {
         foreach ($schema_data_names as $schema_data_name) {
             $item = $this->newBasicItem($schema_data_name);

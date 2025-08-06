@@ -10,23 +10,24 @@
 namespace Thinreports;
 
 use Thinreports\Exception;
+use Thinreports\Exception\IncompatibleLayout;
 use Thinreports\Item;
 use Thinreports\Page\Page;
 
 class Layout
 {
-    const FILE_EXT_NAME = 'tlf';
-    const COMPATIBLE_VERSION_RANGE_START = '>= 0.8.2';
-    const COMPATIBLE_VERSION_RANGE_END   = '< 1.0.0';
+    public const FILE_EXT_NAME = 'tlf';
+    public const COMPATIBLE_VERSION_RANGE_START = '>= 0.8.2';
+    public const COMPATIBLE_VERSION_RANGE_END   = '< 1.0.0';
 
     /**
      * @param string $filename
      * @return self
      * @throws Exception\StandardException
      */
-    static public function loadFile($filename)
+    public static function loadFile(string $filename): Layout
     {
-        if (pathinfo($filename, PATHINFO_EXTENSION) != self::FILE_EXT_NAME) {
+        if (pathinfo($filename, PATHINFO_EXTENSION) !== self::FILE_EXT_NAME) {
             $filename .= '.' . self::FILE_EXT_NAME;
         }
 
@@ -40,8 +41,9 @@ class Layout
     /**
      * @param string $data
      * @return self
+     * @throws IncompatibleLayout
      */
-    static public function loadData($data)
+    public static function loadData(string $data): Layout
     {
         $schema = self::parse($data);
         $identifier = md5($data);
@@ -56,7 +58,7 @@ class Layout
      * @return array
      * @throws Exception\IncompatibleLayout
      */
-    static public function parse($file_content)
+    public static function parse(string $file_content): array
     {
         $schema = json_decode($file_content, true);
 
@@ -85,9 +87,9 @@ class Layout
      * @access private
      *
      * @param string $layout_version
-     * @return boolean
+     * @return bool
      */
-    static public function isCompatible($layout_version)
+    public static function isCompatible(string $layout_version): bool
     {
         $rules = array(
             self::COMPATIBLE_VERSION_RANGE_START,
@@ -95,7 +97,7 @@ class Layout
         );
 
         foreach ($rules as $rule) {
-            list($operator, $version) = explode(' ', $rule);
+            [$operator, $version] = explode(' ', $rule);
 
             if (!version_compare($layout_version, $version, $operator)) {
                 return false;
@@ -112,7 +114,7 @@ class Layout
      * @param array $schema
      * @param string $identifier
      */
-    public function __construct(array $schema, $identifier)
+    public function __construct(array $schema, string $identifier)
     {
         $this->schema = $schema;
         $this->identifier = $identifier;
@@ -122,7 +124,7 @@ class Layout
     /**
      * @return string
      */
-    public function getReportTitle()
+    public function getReportTitle(): string
     {
         return $this->schema['title'];
     }
@@ -130,7 +132,7 @@ class Layout
     /**
      * @return string
      */
-    public function getPagePaperType()
+    public function getPagePaperType(): string
     {
         return $this->schema['report']['paper-type'];
     }
@@ -138,22 +140,22 @@ class Layout
     /**
      * @return string[]|null
      */
-    public function getPageSize()
+    public function getPageSize(): ?array
     {
         if ($this->isUserPaperType()) {
             return array(
                 $this->schema['report']['width'],
                 $this->schema['report']['height']
             );
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isPortraitPage()
+    public function isPortraitPage(): bool
     {
         return $this->schema['report']['orientation'] === 'portrait';
     }
@@ -171,7 +173,7 @@ class Layout
      *
      * @return string
      */
-    public function getLastVersion()
+    public function getLastVersion(): string
     {
         return $this->schema['version'];
     }
@@ -182,7 +184,7 @@ class Layout
      * @param array $item_schemas
      * @return array array('with_id' => array(), 'without_id' => array())
      */
-    public function buildItemSchemas(array $item_schemas)
+    public function buildItemSchemas(array $item_schemas): array
     {
         $with_id = array();
         $without_id = array();
@@ -207,9 +209,9 @@ class Layout
      * @access private
      *
      * @param string $id
-     * @return boolean
+     * @return bool
      */
-    public function hasItemById($id)
+    public function hasItemById(string $id): bool
     {
         return array_key_exists($id, $this->item_schemas['with_id']);
     }
@@ -222,7 +224,7 @@ class Layout
      * @return Item\AbstractItem
      * @throws Exception\StandardException
      */
-    public function createItem(Page $owner, $id)
+    public function createItem(Page $owner, string $id)
     {
         if (!$this->hasItemById($id)) {
             throw new Exception\StandardException('Item Not Found', $id);
@@ -251,7 +253,7 @@ class Layout
      *
      * @return string
      */
-    public function getIdentifier()
+    public function getIdentifier(): string
     {
         return $this->identifier;
     }
@@ -261,7 +263,7 @@ class Layout
      *
      * @return array
      */
-    public function getSchema()
+    public function getSchema(): array
     {
         return $this->schema;
     }
@@ -272,18 +274,17 @@ class Layout
      * @param string $filter all|with_id|without_id
      * @return array
      */
-    public function getItemSchemas($filter = 'all')
+    public function getItemSchemas(string $filter = 'all'): array
     {
         switch ($filter) {
             case 'all':
                 return $this->schema['items'];
-                break;
             case 'with_id':
                 return $this->item_schemas['with_id'];
-                break;
             case 'without_id':
                 return $this->item_schemas['without_id'];
-                break;
+            default:
+                return [];
         }
     }
 }

@@ -14,7 +14,7 @@ use Thinreports\Item\Style\TextStyle;
 
 class PageNumberItem extends AbstractItem
 {
-    const TYPE_NAME = 'page-number';
+    public const TYPE_NAME = 'page-number';
 
     private $number_format;
 
@@ -34,7 +34,7 @@ class PageNumberItem extends AbstractItem
      * @param string $new_format
      * @return $this
      */
-    public function setNumberFormat($new_format)
+    public function setNumberFormat(string $new_format): AbstractItem
     {
         $this->number_format = $new_format;
         return $this;
@@ -43,7 +43,7 @@ class PageNumberItem extends AbstractItem
     /**
      * @return $this
      */
-    public function resetNumberFormat()
+    public function resetNumberFormat(): AbstractItem
     {
         $this->setNumberFormat($this->schema['format']);
         return $this;
@@ -52,7 +52,7 @@ class PageNumberItem extends AbstractItem
     /**
      * @return string
      */
-    public function getNumberFormat()
+    public function getNumberFormat(): string
     {
         return $this->number_format;
     }
@@ -60,7 +60,7 @@ class PageNumberItem extends AbstractItem
     /**
      * @access private
      *
-     * @return mixed
+     * @return array|string|string[]
      */
     public function getFormattedPageNumber()
     {
@@ -87,9 +87,9 @@ class PageNumberItem extends AbstractItem
     /**
      * @access private
      *
-     * @return boolean
+     * @return bool
      */
-    public function isForReport()
+    public function isForReport(): bool
     {
         return $this->schema['target'] === '' || $this->schema['target'] === 'report';
     }
@@ -97,7 +97,7 @@ class PageNumberItem extends AbstractItem
     /**
      * {@inheritdoc}
      */
-    public function getBounds()
+    public function getBounds(): array
     {
         return array(
             'x' => $this->schema['x'],

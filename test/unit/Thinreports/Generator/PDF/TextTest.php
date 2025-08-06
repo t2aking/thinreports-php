@@ -7,7 +7,7 @@ class TextTest extends TestCase
 {
     private $tcpdf;
 
-    function setup()
+    public function setup(): void
     {
         $this->tcpdf = $this->getMockBuilder('TCPDF')
                             ->setMethods(array(
@@ -20,7 +20,7 @@ class TextTest extends TestCase
                             ->getMock();
     }
 
-    function test_drawTextBox()
+    public function test_drawTextBox(): void
     {
         $this->tcpdf->expects($this->once())
                     ->method('SetFont')
@@ -71,7 +71,7 @@ class TextTest extends TestCase
         );
     }
 
-    function test_drawTextBox_with_color_none()
+    public function test_drawTextBox_with_color_none(): void
     {
         $this->tcpdf->expects($this->never())
                     ->method('MultiCell');
@@ -88,7 +88,7 @@ class TextTest extends TestCase
         );
     }
 
-    function test_drawText()
+    public function test_drawText(): void
     {
         $this->tcpdf->expects($this->once())
                     ->method('MultiCell')
@@ -110,7 +110,7 @@ class TextTest extends TestCase
         );
     }
 
-    function test_setFontStyles()
+    public function test_setFontStyles(): void
     {
         $this->tcpdf->expects($this->once())
                     ->method('SetFont')
@@ -132,7 +132,7 @@ class TextTest extends TestCase
     /**
      * @dataProvider boxAttributesProvider
      */
-    function test_buildTextBoxStyles($expected_styles, $box_attrs)
+    public function test_buildTextBoxStyles($expected_styles, $box_attrs): void
     {
         $test_text = new Text($this->tcpdf);
         $this->assertEquals(
@@ -140,7 +140,7 @@ class TextTest extends TestCase
             $test_text->buildTextBoxStyles(100, $box_attrs)
         );
     }
-    function boxAttributesProvider()
+    public function boxAttributesProvider(): array
     {
         $correct_text_attrs = array(
             'result' => array(
@@ -259,12 +259,12 @@ class TextTest extends TestCase
     /**
      * @dataProvider textAttributesProvider
      */
-    function test_buildTextStyles($expected_styles, $text_attrs)
+    public function test_buildTextStyles($expected_styles, $text_attrs): void
     {
         $test_text = new Text($this->tcpdf);
         $this->assertSame($expected_styles, $test_text->buildTextStyles($text_attrs));
     }
-    function textAttributesProvider()
+    public function textAttributesProvider(): array
     {
         $case1 = array(
             array(

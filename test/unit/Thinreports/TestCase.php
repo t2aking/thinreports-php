@@ -3,27 +3,27 @@ namespace Thinreports;
 
 use Symfony\Component\Yaml\Yaml;
 
-class TestCase extends \PHPUnit_Framework_TestCase
+class TestCase extends \PHPUnit\Framework\TestCase
 {
     static protected $_item_formats = array();
 
-    function rootDir()
+    public function rootDir(): string
     {
-        return realpath(__DIR__ . '/../');
+        return dirname(__DIR__) . '/';
     }
 
-    function dataDir()
+    public function dataDir(): string
     {
         return $this->rootDir() . '/data';
     }
 
-    function dataItemFormat($item_name, $format_key = 'default')
+    public function dataItemFormat($item_name, $format_key = 'default')
     {
         $this->dataLoadItemFormat($item_name);
         return static::$_item_formats[$item_name][$format_key];
     }
 
-    function dataItemFormatsFor($item_name)
+    public function dataItemFormatsFor($item_name): array
     {
         $this->dataLoadItemFormat($item_name);
 
@@ -39,7 +39,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
         $formats = array();
 
         foreach ($item_name_and_keys as $item_name_and_key) {
-            list($item_name, $format_key) = $item_name_and_key;
+            [$item_name, $format_key] = $item_name_and_key;
 
             $format = $this->dataItemFormat($item_name, $format_key);
             $formats[$format['id']] = $format;
@@ -47,12 +47,12 @@ class TestCase extends \PHPUnit_Framework_TestCase
         return $formats;
     }
 
-    function dataLayoutFile($name)
+    public function dataLayoutFile($name): string
     {
         return $this->dataDir() . '/layouts/' . $name;
     }
 
-    private function dataLoadItemFormat($item_name)
+    private function dataLoadItemFormat($item_name): void
     {
         if (!array_key_exists($item_name, static::$_item_formats)) {
             $format_file = $this->dataDir() . '/items/' . $item_name . '.yml';

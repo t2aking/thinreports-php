@@ -14,7 +14,7 @@ class UnavailableStyleValue extends StandardException
     /**
      * @param string $style_name
      * @param mixed $value
-     * @param mixed[] $available_values
+     * @param array $available_values
      */
     public function __construct($style_name, $value, array $available_values)
     {

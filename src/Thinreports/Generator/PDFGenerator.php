@@ -9,11 +9,11 @@
 
 namespace Thinreports\Generator;
 
+use Thinreports\Exception\StandardException;
+use Thinreports\Item\AbstractItem;
 use Thinreports\Report;
 use Thinreports\Layout;
 use Thinreports\Page\Page;
-use Thinreports\Generator\Renderer;
-use Thinreports\Generator\PDF;
 
 /**
  * @access private
@@ -36,13 +36,17 @@ class PDFGenerator
     private $item_renderer;
 
     /**
+     * @var PDF\Document
+     */
+    private $doc;
+
+    /**
      * @param Report $report
      * @return string
      */
-    static public function generate(Report $report)
+    public static function generate(Report $report): string
     {
-        $generator = new self($report);
-        return $generator->render();
+        return (new self($report))->render();
     }
 
     /**
@@ -57,8 +61,9 @@ class PDFGenerator
 
     /**
      * @return string
+     * @throws StandardException
      */
-    public function render()
+    public function render(): string
     {
         foreach ($this->report->getPages() as $page) {
             if ($page->isBlank()) {
@@ -72,8 +77,9 @@ class PDFGenerator
 
     /**
      * @param Page $page
+     * @throws StandardException
      */
-    public function renderPage(Page $page)
+    public function renderPage(Page $page): void
     {
         $layout = $page->getLayout();
 
@@ -85,8 +91,9 @@ class PDFGenerator
 
     /**
      * @param Layout $layout
+     * @throws StandardException
      */
-    public function renderLayout(Layout $layout)
+    public function renderLayout(Layout $layout): void
     {
         $layout_identifier = $layout->getIdentifier();
 
@@ -100,9 +107,9 @@ class PDFGenerator
     }
 
     /**
-     * @param Thinreports\Item\AbstractItem[] $items
+     * @param AbstractItem[] $items
      */
-    public function renderItems(array $items)
+    public function renderItems(array $items): void
     {
         foreach ($items as $item) {
             $this->item_renderer->render($item);

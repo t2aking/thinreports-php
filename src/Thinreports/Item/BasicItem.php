@@ -39,9 +39,9 @@ class BasicItem extends AbstractItem
     /**
      * @access private
      *
-     * @return boolean
+     * @return bool
      */
-    public function isImage()
+    public function isImage(): bool
     {
         return $this->isTypeOf('image');
     }
@@ -49,9 +49,9 @@ class BasicItem extends AbstractItem
     /**
      * @access private
      *
-     * @return boolean
+     * @return bool
      */
-    public function isText()
+    public function isText(): bool
     {
         return $this->isTypeOf('text');
     }
@@ -59,9 +59,9 @@ class BasicItem extends AbstractItem
     /**
      * @access private
      *
-     * @return boolean
+     * @return bool
      */
-    public function isRect()
+    public function isRect(): bool
     {
         return $this->isTypeOf('rect');
     }
@@ -69,9 +69,9 @@ class BasicItem extends AbstractItem
     /**
      * @access private
      *
-     * @return boolean
+     * @return bool
      */
-    public function isEllipse()
+    public function isEllipse(): bool
     {
         return $this->isTypeOf('ellipse');
     }
@@ -79,9 +79,9 @@ class BasicItem extends AbstractItem
     /**
      * @access private
      *
-     * @return boolean
+     * @return bool
      */
-    public function isLine()
+    public function isLine(): bool
     {
         return $this->isTypeOf('line');
     }
@@ -89,15 +89,15 @@ class BasicItem extends AbstractItem
     /**
      * {@inheritdoc}
      */
-    public function isTypeOf($type_name)
+    public function isTypeOf(string $type_name): bool
     {
-        return parent::isTypeOf($type_name) || self::TYPE_NAME == $type_name;
+        return parent::isTypeOf($type_name) || self::TYPE_NAME === $type_name;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getBounds()
+    public function getBounds(): array
     {
         $schema = $this->getSchema();
 
@@ -109,7 +109,6 @@ class BasicItem extends AbstractItem
                     'width'  => $schema['width'],
                     'height' => $schema['height']
                 );
-                break;
             case $this->isEllipse():
                 return array(
                     'cx' => $schema['cx'],
@@ -117,7 +116,6 @@ class BasicItem extends AbstractItem
                     'rx' => $schema['rx'],
                     'ry' => $schema['ry']
                 );
-                break;
             case $this->isLine():
                 return array(
                     'x1' => $schema['x1'],
@@ -125,7 +123,8 @@ class BasicItem extends AbstractItem
                     'x2' => $schema['x2'],
                     'y2' => $schema['y2']
                 );
-                break;
+            default:
+                return [];
         }
     }
 }

@@ -9,6 +9,8 @@
 
 namespace Thinreports\Generator\PDF;
 
+use TCPDF;
+
 /**
  * @access private
  */
@@ -36,14 +38,14 @@ class Text
     static private $pdf_default_line_height = 1;
 
     /**
-     * @var \TCPDF
+     * @var TCPDF
      */
     private $pdf;
 
     /**
-     * @param \TCPDF
+     * @param TCPDF $pdf
      */
-    public function __construct(\TCPDF $pdf)
+    public function __construct(TCPDF $pdf)
     {
         $this->pdf = $pdf;
     }
@@ -68,7 +70,7 @@ class Text
      * }
      * @see http://www.tcpdf.org/doc/code/classTCPDF.html
      */
-    public function drawTextBox($content, $x, $y, $width, $height, array $attrs = array())
+    public function drawTextBox(string $content, $x, $y, $width, $height, array $attrs = array()): void
     {
         $styles = $this->buildTextBoxStyles($height, $attrs);
 
@@ -115,7 +117,7 @@ class Text
     /**
      * {@see self::drawTextBox}
      */
-    public function drawText($content, $x, $y, $width, $height, array $attrs = array())
+    public function drawText($content, $x, $y, $width, $height, array $attrs = array()): void
     {
         $content = str_replace("\n", ' ', $content);
         $attrs['single_row'] = true;
@@ -126,7 +128,7 @@ class Text
     /**
      * @param array $style
      */
-    public function setFontStyles(array $style)
+    public function setFontStyles(array $style): void
     {
         $this->pdf->SetFont(
             $style['font_family'],
@@ -140,7 +142,7 @@ class Text
      * @param array $attrs
      * @return array
      */
-    public function buildTextStyles(array $attrs)
+    public function buildTextStyles(array $attrs): array
     {
         $font_style = array();
 
@@ -172,7 +174,7 @@ class Text
             $valign = 'top';
         }
 
-        if ($attrs['color'] == 'none') {
+        if ($attrs['color'] === 'none') {
             $color = null;
         } else {
             $color = ColorParser::parse($attrs['color']);
@@ -195,7 +197,7 @@ class Text
      * @param array $attrs
      * @return array
      */
-    public function buildTextBoxStyles($box_height, array $attrs)
+    public function buildTextBoxStyles($box_height, array $attrs): array
     {
         $is_single = array_key_exists('single_row', $attrs)
                      && $attrs['single_row'] === true;
@@ -219,6 +221,7 @@ class Text
                 $max_height = $box_height;
                 break;
             case 'expand':
+            default:
                 $fit_cell   = false;
                 $max_height = 0;
                 break;
@@ -238,23 +241,23 @@ class Text
      * @param string $family
      * @param array $styles
      * @param integer[] $color
-     * @return boolean
+     * @return bool
      */
-    public function startStyleEmulation($family, array $styles, array $color)
+    public function startStyleEmulation(string $family, array $styles, array $color): bool
     {
-        $need_emulate = in_array('bold', $styles)
+        $need_emulate = in_array('bold', $styles, true)
                         && Font::isBuiltinUnicodeFont($family);
 
         if (!$need_emulate) {
             return false;
-        } else {
-            $this->pdf->setDrawColorArray($color);
-            $this->pdf->setTextRenderingMode($this->pdf->GetLineWidth() * 0.1);
-            return true;
         }
+
+        $this->pdf->setDrawColorArray($color);
+        $this->pdf->setTextRenderingMode($this->pdf->GetLineWidth() * 0.1);
+        return true;
     }
 
-    public function resetStyleEmulation()
+    public function resetStyleEmulation(): void
     {
         $this->pdf->setTextRenderingMode(0);
     }

@@ -14,7 +14,7 @@ namespace Thinreports\Generator\PDF;
  */
 class Font
 {
-    const STORE_PATH = '/../../../../fonts';
+    public const STORE_PATH = '/../../../../fonts';
 
     /**
      * @var string[]
@@ -33,7 +33,7 @@ class Font
         'Times New Roman' => 'Times'
     );
 
-    static public function build()
+    public static function build(): void
     {
         foreach (array_keys(self::$builtin_unicode_fonts) as $name) {
             self::installBuiltinFont($name);
@@ -44,7 +44,7 @@ class Font
      * @param string $name
      * @return string
      */
-    static public function getFontName($name)
+    public static function getFontName(string $name): string
     {
         if (array_key_exists($name, self::$builtin_font_aliases)) {
             return self::$builtin_font_aliases[$name];
@@ -53,9 +53,9 @@ class Font
         if (array_key_exists($name, self::$builtin_unicode_fonts)) {
             if (self::isInstalledFont($name)) {
                 return static::$installed_builtin_fonts[$name];
-            } else {
-                return self::installBuiltinFont($name);
             }
+
+            return self::installBuiltinFont($name);
         }
         return $name;
     }
@@ -65,7 +65,7 @@ class Font
      * @return string
      * @see http://www.tcpdf.org/doc/code/classTCPDF__FONTS.html
      */
-    static public function installBuiltinFont($name)
+    public static function installBuiltinFont(string $name): string
     {
         $filename = self::getBuiltinFontPath($name);
 
@@ -77,9 +77,9 @@ class Font
 
     /**
      * @param string $name
-     * @return boolean
+     * @return bool
      */
-    static public function isInstalledFont($name)
+    public static function isInstalledFont(string $name): bool
     {
         return array_key_exists($name, static::$installed_builtin_fonts);
     }
@@ -88,7 +88,7 @@ class Font
      * @param string $name
      * @return string
      */
-    static public function getBuiltinFontPath($name)
+    public static function getBuiltinFontPath(string $name): string
     {
         $font_directory = realpath(__DIR__ . self::STORE_PATH);
         return $font_directory . '/' . self::$builtin_unicode_fonts[$name];
@@ -98,8 +98,8 @@ class Font
      * @param string $name
      * @return boolean
      */
-    static public function isBuiltinUnicodeFont($name)
+    public static function isBuiltinUnicodeFont(string $name): bool
     {
-        return in_array($name, array_keys(static::$builtin_unicode_fonts));
+        return array_key_exists($name, static::$builtin_unicode_fonts);
     }
 }

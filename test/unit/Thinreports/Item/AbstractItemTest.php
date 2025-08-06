@@ -8,7 +8,10 @@ use Thinreports\Item\Style\GraphicStyle;
 
 class TestItem extends AbstractItem
 {
-    public function getBounds() {}
+    public function getBounds(): array
+    {
+        return array();
+    }
 }
 
 class TestGraphicsItem extends AbstractItem
@@ -22,20 +25,23 @@ class TestGraphicsItem extends AbstractItem
         $this->style = new GraphicStyle($schema);
     }
 
-    public function getBounds() {}
+    public function getBounds(): array
+    {
+        return array();
+    }
 }
 
 class AbstractItemTest extends TestCase
 {
     private $page;
 
-    function setup()
+    public function setup(): void
     {
         $report = new Report($this->dataLayoutFile('empty_A4P.tlf'));
         $this->page = $report->addPage();
     }
 
-    function test_initialize()
+    public function test_initialize(): void
     {
         $item = new TestItem($this->page, array('display' => true));
         $this->assertTrue($item->isVisible());
@@ -51,7 +57,7 @@ class AbstractItemTest extends TestCase
      *      AbstractItem::show
      *      AbstractItem::hide
      */
-    function test_methods_for_visibility()
+    public function test_methods_for_visibility(): void
     {
         $item = new TestItem($this->page, array('display' => true));
 
@@ -70,7 +76,7 @@ class AbstractItemTest extends TestCase
         $this->assertSame($item, $item->setVisible(true));
     }
 
-    function test_setStyle()
+    public function test_setStyle(): void
     {
         $item = new TestGraphicsItem($this->page, $this->dataItemFormat('rect'));
 
@@ -78,14 +84,14 @@ class AbstractItemTest extends TestCase
         $this->assertEquals('red', $item->style->get_fill_color());
     }
 
-    function test_getStyle()
+    public function test_getStyle(): void
     {
         $item = new TestGraphicsItem($this->page, $this->dataItemFormat('rect'));
         $this->assertEquals('#ffffff', $item->getStyle('fill_color'));
         $this->assertEquals('1', $item->getStyle('border_width'));
     }
 
-    function test_setStyles()
+    public function test_setStyles(): void
     {
         $item = new TestGraphicsItem($this->page, $this->dataItemFormat('rect'));
 
@@ -94,7 +100,7 @@ class AbstractItemTest extends TestCase
         $this->assertEquals(999, $item->style->get_border_width());
     }
 
-    function test_exportStyles()
+    public function test_exportStyles(): void
     {
         $item = new TestGraphicsItem($this->page, $this->dataItemFormat('rect'));
         $item->style->set_fill_color('#0000ff');
@@ -102,13 +108,23 @@ class AbstractItemTest extends TestCase
         $this->assertEquals($item->style->export(), $item->exportStyles());
     }
 
-    function test_getParent()
+    public function test_clone(): void
+    {
+        $item = new TestGraphicsItem($this->page, $this->dataItemFormat('rect'));
+
+        $clonedItem = clone $item;
+
+        $this->assertSame($item->getStyle('border'), $clonedItem->getStyle('border'));
+        $this->assertEquals($item->getStyle('border_color'), $clonedItem->getStyle('border_color'));
+    }
+
+    public function test_getParent(): void
     {
         $item = new TestItem($this->page, array('display' => true));
         $this->assertSame($this->page, $item->getParent());
     }
 
-    function test_getIsDynamic()
+    public function test_getIsDynamic(): void
     {
         $item = new TestItem($this->page, array('id' => '', 'display' => true));
         $this->assertFalse($item->isDynamic());
@@ -117,14 +133,14 @@ class AbstractItemTest extends TestCase
         $this->assertTrue($item->isDynamic());
     }
 
-    function test_getSchema()
+    public function test_getSchema(): void
     {
         $schema = array('display' => true);
         $item = new TestItem($this->page, $schema);
         $this->assertSame($schema, $item->getSchema());
     }
 
-    function test_getId()
+    public function test_getId(): void
     {
         $item = new TestItem($this->page, array(
             'display' => true,
@@ -134,7 +150,7 @@ class AbstractItemTest extends TestCase
         $this->assertEquals('foo_id', $item->getId());
     }
 
-    function test_isTypeOf()
+    public function test_isTypeOf(): void
     {
         $item = new TestItem($this->page, array(
             'display' => true,

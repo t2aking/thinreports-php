@@ -1,7 +1,7 @@
 ---
 default: &default
   type: page-number
-  id: ""
+  id: page_number_default
   x: 100
   y: 100
   width: 100

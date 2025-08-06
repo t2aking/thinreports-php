@@ -10,7 +10,7 @@ namespace Thinreports\Item;
 
 class TextFormatter
 {
-    private $format = array();
+    private $format;
 
     public function __construct(array $format)
     {
@@ -78,15 +78,15 @@ class TextFormatter
 
         if (empty($datetime_format['format'])) {
             return $value;
-        } else {
-            $datetime = date_create($value);
-
-            if ($datetime) {
-                return strftime($datetime_format['format'], date_timestamp_get($datetime));
-            } else {
-                return $value;
-            }
         }
+
+        $datetime = date_create($value);
+
+        if ($datetime) {
+            return strftime($datetime_format['format'], date_timestamp_get($datetime));
+        }
+
+        return $value;
     }
 
     /**
@@ -101,7 +101,7 @@ class TextFormatter
 
         $character = $padding_format['char'];
         $direction = $padding_format['direction'];
-        $length = intval($padding_format['length']);
+        $length = (int)$padding_format['length'];
 
         if ($character === null || $character === '' || $length === 0) {
             return $value;
@@ -122,13 +122,13 @@ class TextFormatter
     private function applyBaseFormat($value)
     {
         $base_format = $this->format['base'];
-        $pattern = '/\{value\}/';
+        $pattern = '/\{value}/';
 
         if (preg_match($pattern, $base_format)) {
             return preg_replace($pattern, $value, $base_format);
-        } else {
-            return $value;
         }
+
+        return $value;
     }
 
     /**
@@ -140,10 +140,10 @@ class TextFormatter
      * @param string|integer $length
      * @return string
      */
-    private function padChars($direction, $string, $padstr, $length)
+    private function padChars(string $direction, string $string, string $padstr, $length): string
     {
         while (mb_strlen($string, 'UTF-8') < $length) {
-            if ($direction == 'L') {
+            if ($direction === 'L') {
                 $string = $padstr . $string;
             } else {
                 $string .= $padstr;
@@ -153,7 +153,7 @@ class TextFormatter
         $string_length = mb_strlen($string, 'UTF-8');
 
         if ($string_length > $length) {
-            if ($direction == 'L') {
+            if ($direction === 'L') {
                 $string = mb_substr($string, $string_length - $length, $string_length, 'UTF-8');
             } else {
                 $string = mb_substr($string, 0, $length, 'UTF-8');

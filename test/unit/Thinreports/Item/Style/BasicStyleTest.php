@@ -8,7 +8,7 @@ class TestStyle extends BasicStyle
 {
     static protected $available_style_names = array('style_a');
 
-    public function set_style_a($value)
+    public function set_style_a($value): void
     {
         $this->styles['style_a'] = $value;
     }
@@ -24,12 +24,12 @@ class BasicStyleTest extends TestCase
     private $test_style;
     private $item_format;
 
-    function setup()
+    public function setup(): void
     {
         $this->test_style = new TestStyle(array('style_a' => 'style_a_value'));
     }
 
-    function test_initialize()
+    public function test_initialize(): void
     {
         $this->assertAttributeSame(array('style_a' => 'style_a_value'),
             'styles', $this->test_style);
@@ -40,7 +40,7 @@ class BasicStyleTest extends TestCase
      *      BasicStyle::set
      *      BasicStyle::verifyStyleName
      */
-    function test_set()
+    public function test_set(): void
     {
         try {
             $this->test_style->set('unknown_style', 'value');
@@ -59,7 +59,7 @@ class BasicStyleTest extends TestCase
      *      BasicStyle::get
      *      BasicStyle::verifyStyleName
      */
-    function test_get()
+    public function test_get(): void
     {
         try {
             $this->test_style->get('unknown_style');
@@ -71,7 +71,7 @@ class BasicStyleTest extends TestCase
         $this->assertEquals('style_a_value', $this->test_style->get('style_a'));
     }
 
-    function test_export()
+    public function test_export(): void
     {
         $this->assertSame(array('style_a' => 'style_a_value'), $this->test_style->export());
 
@@ -79,13 +79,13 @@ class BasicStyleTest extends TestCase
         $this->assertSame(array('style_a' => 'new value'), $this->test_style->export());
     }
 
-    function test_readStyle()
+    public function test_readStyle(): void
     {
         $this->assertEquals('style_a_value', $this->test_style->readStyle('style_a'));
         $this->assertNull($this->test_style->readStyle('nonexistent_style'));
     }
 
-    function test_verifyStyleValue()
+    public function test_verifyStyleValue(): void
     {
         try {
             $this->test_style->verifyStyleValue('style_a', 'Unavailable_value',
@@ -101,5 +101,7 @@ class BasicStyleTest extends TestCase
         } catch (\Exception $e) {
             $this->fail();
         }
+
+        $this->assertTrue(true);
     }
 }

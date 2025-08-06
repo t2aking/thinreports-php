@@ -1,4 +1,7 @@
 <?php
+
+use Thinreports\Exception\StandardException;
+
 require_once __DIR__ . '/../test_helper.php';
 
 class ReportAndPageFeature extends FeatureTest
@@ -10,10 +13,14 @@ class ReportAndPageFeature extends FeatureTest
         'user_400x400' => array('width' => 400.0,   'height' => 400.0)
     );
 
-    function test_reportProperties()
+    public function test_reportProperties(): void
     {
         $report = new Thinreports\Report(__DIR__ . '/layouts/report_with_title.tlf');
-        $report->addPage();
+        try {
+            $report->addPage();
+        } catch (StandardException $e) {
+            $this->fail('Failed to add a page to the report');
+        }
 
         $analyzer = $this->analyzePDF($report->generate());
 
@@ -21,11 +28,15 @@ class ReportAndPageFeature extends FeatureTest
         $this->assertEquals('Thinreports Generator', $analyzer->getPropertyCreator());
     }
 
-    function test_multiplePages()
+    public function test_multiplePages(): void
     {
         $report = new Thinreports\Report(__DIR__ . '/layouts/normal_page.tlf');
-        $report->addPage();
-        $report->addPage();
+        try {
+            $report->addPage();
+            $report->addPage();
+        } catch (StandardException $e) {
+            $this->fail('Failed to add a page to the report');
+        }
         $report->addBlankPage();
 
         $analyzer = $this->analyzePDF($report->generate());
@@ -39,10 +50,14 @@ class ReportAndPageFeature extends FeatureTest
     /**
      * @dataProvider pageFormatPatternProvider
      */
-    function test_basicPageFormats($layout_filename, $layout_page_size)
+    public function test_basicPageFormats($layout_filename, $layout_page_size): void
     {
         $report = new Thinreports\Report(__DIR__ . "/layouts/{$layout_filename}.tlf");
-        $report->addPage();
+        try {
+            $report->addPage();
+        } catch (StandardException $e) {
+            $this->fail('Failed to add a page to the report');
+        }
 
         $analyzer = $this->analyzePDF($report->generate());
         $page_size = $analyzer->getSizeOfPage(1);
@@ -50,7 +65,7 @@ class ReportAndPageFeature extends FeatureTest
         $this->assertEquals($layout_page_size['width'], $page_size['width']);
         $this->assertEquals($layout_page_size['height'], $page_size['height']);
     }
-    function pageFormatPatternProvider()
+    public function pageFormatPatternProvider(): array
     {
         $page_formats = array();
 
@@ -66,17 +81,26 @@ class ReportAndPageFeature extends FeatureTest
         return $page_formats;
     }
 
-    function test_multipleLayouts()
+    public function test_multipleLayouts(): void
     {
         $report = new Thinreports\Report(__DIR__ . '/layouts/A4_landscape.tlf');
 
         foreach (array_keys($this->layout_geometries) as $filename) {
-            $report->addPage(__DIR__ . "/layouts/{$filename}.tlf");
-            # Insert a blank page
-            $report->addBlankPage();
+            try {
+                $report->addPage(__DIR__ . "/layouts/{$filename}.tlf");
+                # Insert a blank page
+                $report->addBlankPage();
+            } catch (StandardException $e) {
+                $this->fail('Failed to add a page to the report');
+            }
         }
-        # Finally, insert a page without specifing layout
-        $report->addPage();
+
+        try {
+            # Finally, insert a page without specifing layout
+            $report->addPage();
+        } catch (StandardException $e) {
+            $this->fail('Failed to add a page to the report');
+        }
 
         $analyzer = $this->analyzePDF($report->generate());
 

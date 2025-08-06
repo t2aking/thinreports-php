@@ -3,31 +3,32 @@ namespace Thinreports\Item;
 
 use Thinreports\TestCase;
 use Thinreports\Report;
+use Thinreports\Item\Style\BasicStyle;
 
 class ImageBlockItemTest extends TestCase
 {
     private $page;
 
-    function setup()
+    public function setup(): void
     {
         $report = new Report($this->dataLayoutFile('empty_A4P.tlf'));
         $this->page = $report->addPage();
     }
 
-    private function newImageBlock()
+    private function newImageBlock(): ImageBlockItem
     {
         $schema = $this->dataItemFormat('image_block', 'default');
         return new ImageBlockItem($this->page, $schema);
     }
 
-    function test_initialize()
+    public function test_initialize(): void
     {
         $test_item = $this->newImageBlock();
-        $this->assertAttributeInstanceOf('Thinreports\Item\Style\BasicStyle',
+        $this->assertAttributeInstanceOf(BasicStyle::class,
             'style', $test_item);
     }
 
-    function test_setSource()
+    public function test_setSource(): void
     {
         $test_item = $this->newImageBlock();
 
@@ -35,7 +36,7 @@ class ImageBlockItemTest extends TestCase
         $this->assertEquals('/path/to/image.png', $test_item->getValue());
     }
 
-    function test_getSource()
+    public function test_getSource(): void
     {
         $test_item = $this->newImageBlock();
         $this->assertSame('', $test_item->getSource());
@@ -44,7 +45,7 @@ class ImageBlockItemTest extends TestCase
         $this->assertEquals('/path/to/image.png', $test_item->getSource());
     }
 
-    function test_isTypeOf()
+    public function test_isTypeOf(): void
     {
         $test_item = $this->newImageBlock();
         $this->assertTrue($test_item->isTypeOf('image-block'));

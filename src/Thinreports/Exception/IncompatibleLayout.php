@@ -15,7 +15,7 @@ class IncompatibleLayout extends StandardException
      * @param string $layout_version
      * @param array[] $required_rules
      */
-    public function __construct($layout_version, array $required_rules)
+    public function __construct(string $layout_version, array $required_rules)
     {
         $message = 'The layout file that created/modified with ' . $layout_version .
                    ' is incompatible with this version.' .

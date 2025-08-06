@@ -1,32 +1,47 @@
 <?php
+
+use Thinreports\Exception\StandardException;
+
 require_once __DIR__ . '/../test_helper.php';
 
 class TextRenderingFeature extends FeatureTest
 {
-    function test_staticTextsRenderingWithProperlyFont()
+    public function test_staticTextsRenderingWithProperlyFont(): void
     {
         $report = new Thinreports\Report(__DIR__ . '/layouts/static_texts.tlf');
-        $report->addPage();
+        try {
+            $report->addPage();
+        } catch (StandardException $e) {
+            $this->fail('Failed to add a page to the report');
+        }
 
         $this->assertRenderingTextAndFont($report);
     }
 
-    function test_dynamicTextRenderingWithProperlyFont()
+    public function test_dynamicTextRenderingWithProperlyFont(): void
     {
         $report = new Thinreports\Report(__DIR__ . '/layouts/dynamic_texts.tlf');
-        $page = $report->addPage();
+        try {
+            $page = $report->addPage();
+        } catch (StandardException $e) {
+            $this->fail('Failed to add a page to the report');
+        }
 
-        $page->setItemValues(array(
-            'helvetica' => 'Helvetica',
-            'courier_new' => 'Courier New',
-            'times_new_roman' => 'Times New Roman',
-            'ipa_m' => 'IPA 明朝'
-        ));
+        try {
+            $page->setItemValues(array(
+                'helvetica' => 'Helvetica',
+                'courier_new' => 'Courier New',
+                'times_new_roman' => 'Times New Roman',
+                'ipa_m' => 'IPA 明朝'
+            ));
+        } catch (StandardException $e) {
+            $this->fail('Failed to set item values');
+        }
 
         $this->assertRenderingTextAndFont($report);
     }
 
-    private function assertRenderingTextAndFont($report)
+    private function assertRenderingTextAndFont($report): void
     {
         $analyzer = $this->analyzePDF($report->generate());
 

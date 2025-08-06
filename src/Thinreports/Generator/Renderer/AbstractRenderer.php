@@ -33,7 +33,7 @@ abstract class AbstractRenderer
      * @param array $styles
      * @return array
      */
-    public function buildGraphicStyles(array $styles)
+    public function buildGraphicStyles(array $styles): array
     {
         return array(
             'stroke_color' => $styles['border-color'],
@@ -44,10 +44,10 @@ abstract class AbstractRenderer
     }
 
     /**
-     * @param array $svg_attrs
+     * @param array $styles
      * @return array
      */
-    public function buildTextStyles(array $styles)
+    public function buildTextStyles(array $styles): array
     {
         return array(
             'font_family'    => $styles['font-family'][0],
@@ -63,7 +63,7 @@ abstract class AbstractRenderer
      * @param string|null $valign
      * @return string
      */
-    public function buildVerticalAlign($valign)
+    public function buildVerticalAlign(?string $valign): string
     {
         return $valign ?: 'top';
     }
@@ -72,9 +72,9 @@ abstract class AbstractRenderer
      * @param string|null $letter_spacing
      * @return string|null
      */
-    public function buildLetterSpacing($letter_spacing)
+    public function buildLetterSpacing(?string $letter_spacing): ?string
     {
-        if (in_array($letter_spacing, array(null, 'auto', 'normal'))) {
+        if (in_array($letter_spacing, array(null, 'auto', 'normal'), true)) {
             return null;
         } else {
             return $letter_spacing;
