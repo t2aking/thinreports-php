@@ -14,7 +14,7 @@ class StandardException extends \Exception
     /**
      * @var string|null The subject of Exception
      */
-    protected $subject = null;
+    protected mixed $subject = null;
 
     /**
      * @param string $message,...
