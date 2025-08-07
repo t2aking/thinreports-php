@@ -42,8 +42,8 @@ class ReportAndPageFeature extends FeatureTest
         $analyzer = $this->analyzePDF($report->generate());
 
         $this->assertEquals(3, $analyzer->getPageCount());
-        $this->assertContains('Normal Page', $analyzer->getTextsInPage(1));
-        $this->assertContains('Normal Page', $analyzer->getTextsInPage(2));
+        $this->assertStringContainsString('Normal Page', $analyzer->getTextsInPage(1));
+        $this->assertStringContainsString('Normal Page', $analyzer->getTextsInPage(2));
         $this->assertTrue($analyzer->isEmptyPage(3));
     }
 

@@ -17,7 +17,7 @@ class TestItem extends AbstractItem
 class TestGraphicsItem extends AbstractItem
 {
     // make public for testing
-    public $style;
+    public mixed $style;
 
     public function __construct(Page $parent, array $schema)
     {

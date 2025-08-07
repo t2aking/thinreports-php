@@ -1,16 +1,17 @@
 <?php
 namespace Thinreports\Item\Style;
 
+use ReflectionClass;
 use Thinreports\TestCase;
-use Thinreports\Item\Style\GraphicStyle;
 
 class GraphicStyleTest extends TestCase
 {
     public function test_available_style_names(): void
     {
-        $this->assertAttributeEquals(
+        $reflection = new ReflectionClass(GraphicStyle::class);
+        $this->assertSame(
             array('border_color', 'border_width', 'border', 'fill_color'),
-            'available_style_names', GraphicStyle::class
+            $reflection->getProperty('available_style_names')->getValue()
         );
     }
 
@@ -19,7 +20,7 @@ class GraphicStyleTest extends TestCase
         $test_style = new GraphicStyle(array('border-width' => 1));
         $test_style->set_border_width(999.9);
 
-        $this->assertAttributeEquals(array('border-width' => 999.9), 'styles', $test_style);
+        $this->assertSame(array('border-width' => 999.9), $test_style->export());
     }
 
     public function test_get_border_width(): void
@@ -34,7 +35,7 @@ class GraphicStyleTest extends TestCase
         $test_style = new GraphicStyle(array('border-color' => 'none'));
         $test_style->set_border_color('#000000');
 
-        $this->assertAttributeEquals(array('border-color' => '#000000'), 'styles', $test_style);
+        $this->assertSame(array('border-color' => '#000000'), $test_style->export());
     }
 
     public function test_get_border_color(): void
@@ -49,10 +50,10 @@ class GraphicStyleTest extends TestCase
         $test_style = new GraphicStyle(array('border-color' => 'none', 'border-width' => 1));
         $test_style->set_border(array(9, '#ffffff'));
 
-        $this->assertAttributeEquals(array('border-color' => '#ffffff', 'border-width' => 9), 'styles', $test_style);
+        $this->assertSame(array('border-color' => '#ffffff', 'border-width' => 9), $test_style->export());
     }
 
-    function test_get_border()
+    public function test_get_border(): void
     {
         $test_style = new GraphicStyle(array('border-color' => 'none', 'border-width' => 1.0));
 
@@ -64,7 +65,7 @@ class GraphicStyleTest extends TestCase
         $test_style = new GraphicStyle(array('fill-color' => 'none'));
         $test_style->set_fill_color('#000000');
 
-        $this->assertAttributeEquals(array('fill-color' => '#000000'), 'styles', $test_style);
+        $this->assertSame(array('fill-color' => '#000000'), $test_style->export());
     }
 
     public function test_get_fill_color(): void

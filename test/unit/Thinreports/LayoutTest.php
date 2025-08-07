@@ -1,6 +1,8 @@
 <?php
 namespace Thinreports;
 
+use ReflectionClass;
+use ReflectionException;
 use Thinreports\Exception;
 use Thinreports\Exception\StandardException;
 use Thinreports\Item;
@@ -33,6 +35,9 @@ class LayoutTest extends TestCase
         $this->assertNotNull($layout);
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function test_loadData(): void
     {
         $schema_data = '{"version":"0.10.1","items":[]}';
@@ -43,7 +48,10 @@ class LayoutTest extends TestCase
         }
 
         $this->assertNotNull($layout);
-        $this->assertAttributeEquals(md5($schema_data), 'identifier', $layout);
+        $reflection = new ReflectionClass($layout);
+        $property = $reflection->getProperty('identifier');
+        $property->setAccessible(true);
+        $this->assertEquals(md5($schema_data), $property->getValue($layout));
     }
 
     public function test_parse(): void
@@ -123,9 +131,16 @@ class LayoutTest extends TestCase
 
         $layout = new Layout($schema, 'layout_identifier');
 
-        $this->assertAttributeSame($schema, 'schema', $layout);
-        $this->assertAttributeEquals('layout_identifier', 'identifier', $layout);
-        $this->assertAttributeEquals(
+        $reflection = new ReflectionClass($layout);
+        $property = $reflection->getProperty('schema');
+        $property->setAccessible(true);
+        $this->assertEquals($schema, $property->getValue($layout));
+        $property = $reflection->getProperty('identifier');
+        $property->setAccessible(true);
+        $this->assertEquals('layout_identifier', $property->getValue($layout));
+        $property = $reflection->getProperty('item_schemas');
+        $property->setAccessible(true);
+        $this->assertEquals(
             array(
                 'with_id' => array(
                     'foo' => array('id' => 'foo', 'type' => 'text-block'),
@@ -136,8 +151,7 @@ class LayoutTest extends TestCase
                     array('id' => '', 'type' => 'line')
                 )
             ),
-            'item_schemas',
-            $layout
+            $property->getValue($layout)
         );
     }
 

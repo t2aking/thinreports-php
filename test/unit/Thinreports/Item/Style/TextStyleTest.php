@@ -1,21 +1,22 @@
 <?php
 namespace Thinreports\Item\Style;
 
+use ReflectionClass;
 use Thinreports\Exception\UnavailableStyleValue;
 use Thinreports\TestCase;
 use Thinreports\Exception;
-use Thinreports\Item\Style\TextStyle;
 
 class TextStyleTest extends TestCase
 {
     public function test_available_style_names(): void
     {
-        $this->assertAttributeEquals(
+        $reflection = new ReflectionClass(TextStyle::class);
+        $this->assertSame(
             array(
                 'bold', 'italic', 'underline', 'linethrough',
                 'align', 'valign', 'color', 'font_size'
             ),
-            'available_style_names', TextStyle::class
+            $reflection->getProperty('available_style_names')->getValue()
         );
     }
 
@@ -24,7 +25,7 @@ class TextStyleTest extends TestCase
         $test_style = new TextStyle(array('color' => 'none'));
         $test_style->set_color('#ff0000');
 
-        $this->assertAttributeEquals(array('color' => '#ff0000'), 'styles', $test_style);
+        $this->assertSame(array('color' => '#ff0000'), $test_style->export());
     }
 
     public function test_get_color(): void
@@ -39,7 +40,7 @@ class TextStyleTest extends TestCase
         $test_style = new TextStyle(array('font-size' => 1));
         $test_style->set_font_size(15.0);
 
-        $this->assertAttributeEquals(array('font-size' => 15.0), 'styles', $test_style);
+        $this->assertSame(array('font-size' => 15.0), $test_style->export());
     }
 
     public function test_get_font_size(): void
@@ -54,11 +55,11 @@ class TextStyleTest extends TestCase
         $test_style = new TextStyle(array('font-style' => array('italic')));
         $test_style->set_bold(true);
 
-        $this->assertAttributeEquals(array('font-style' => array('italic', 'bold')), 'styles', $test_style);
+        $this->assertSame(array('font-style' => array('italic', 'bold')), $test_style->export());
 
         $test_style->set_bold(false);
 
-        $this->assertAttributeEquals(array('font-style' => array('italic')), 'styles', $test_style);
+        $this->assertSame(array('font-style' => array('italic')), $test_style->export());
     }
 
     public function test_get_bold(): void
@@ -75,11 +76,11 @@ class TextStyleTest extends TestCase
         $test_style = new TextStyle(array('font-style' => array()));
         $test_style->set_italic(true);
 
-        $this->assertAttributeEquals(array('font-style' => array('italic')), 'styles', $test_style);
+        $this->assertSame(array('font-style' => array('italic')), $test_style->export());
 
         $test_style->set_italic(false);
 
-        $this->assertAttributeEquals(array('font-style' => array()), 'styles', $test_style);
+        $this->assertSame(array('font-style' => array()), $test_style->export());
     }
 
     public function test_get_italic(): void
@@ -96,11 +97,11 @@ class TextStyleTest extends TestCase
         $test_style = new TextStyle(array('font-style' => array('bold')));
         $test_style->set_underline(true);
 
-        $this->assertAttributeEquals(array('font-style' => array('bold', 'underline')), 'styles', $test_style);
+        $this->assertSame(array('font-style' => array('bold', 'underline')), $test_style->export());
 
         $test_style->set_underline(false);
 
-        $this->assertAttributeEquals(array('font-style' => array('bold')), 'styles', $test_style);
+        $this->assertSame(array('font-style' => array('bold')), $test_style->export());
     }
 
     public function test_get_underline(): void
@@ -117,11 +118,11 @@ class TextStyleTest extends TestCase
         $test_style = new TextStyle(array('font-style' => array('bold')));
         $test_style->set_linethrough(true);
 
-        $this->assertAttributeEquals(array('font-style' => array('bold', 'linethrough')), 'styles', $test_style);
+        $this->assertSame(array('font-style' => array('bold', 'linethrough')), $test_style->export());
 
         $test_style->set_linethrough(false);
 
-        $this->assertAttributeEquals(array('font-style' => array('bold')), 'styles', $test_style);
+        $this->assertSame(array('font-style' => array('bold')), $test_style->export());
     }
 
     public function test_get_linethrough(): void
@@ -146,7 +147,7 @@ class TextStyleTest extends TestCase
 
         $test_style->set_align('right');
 
-        $this->assertAttributeEquals(array('text-align' => 'right'), 'styles', $test_style);
+        $this->assertSame(array('text-align' => 'right'), $test_style->export());
     }
 
     public function test_get_align(): void
@@ -176,7 +177,7 @@ class TextStyleTest extends TestCase
 
         $test_style->set_valign('top');
 
-        $this->assertAttributeEquals(array('vertical-align' => 'top'), 'styles', $test_style);
+        $this->assertSame(array('vertical-align' => 'top'), $test_style->export());
     }
 
     public function test_get_valign(): void

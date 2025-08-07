@@ -6,7 +6,7 @@ use Thinreports\Exception;
 
 class TestStyle extends BasicStyle
 {
-    static protected $available_style_names = array('style_a');
+    static protected array $available_style_names = array('style_a');
 
     public function set_style_a($value): void
     {
@@ -21,8 +21,7 @@ class TestStyle extends BasicStyle
 
 class BasicStyleTest extends TestCase
 {
-    private $test_style;
-    private $item_format;
+    private TestStyle $test_style;
 
     public function setup(): void
     {
@@ -31,8 +30,7 @@ class BasicStyleTest extends TestCase
 
     public function test_initialize(): void
     {
-        $this->assertAttributeSame(array('style_a' => 'style_a_value'),
-            'styles', $this->test_style);
+        $this->assertSame(array('style_a' => 'style_a_value'), $this->test_style->export());
     }
 
     /**
@@ -50,8 +48,7 @@ class BasicStyleTest extends TestCase
         }
 
         $this->test_style->set('style_a', 'new value');
-        $this->assertAttributeSame(array('style_a' => 'new value'),
-            'styles', $this->test_style);
+        $this->assertSame(array('style_a' => 'new value'), $this->test_style->export());
     }
 
     /**

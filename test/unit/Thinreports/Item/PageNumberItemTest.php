@@ -1,15 +1,16 @@
 <?php
 namespace Thinreports\Item;
 
+use ReflectionClass;
+use Thinreports\Page\Page;
 use Thinreports\TestCase;
 use Thinreports\Report;
-use Thinreports\Layout;
 use Thinreports\Item\Style\TextStyle;
 
 class PageNumberItemTest extends TestCase
 {
-    private $page;
-    private $report;
+    private Page $page;
+    private Report $report;
 
     public function setup(): void
     {
@@ -27,10 +28,12 @@ class PageNumberItemTest extends TestCase
     {
         $test_item = $this->newPageNumber('default');
 
-        $this->assertAttributeInstanceOf(TextStyle::class,
-            'style', $test_item);
-        $this->assertAttributeEquals('{page}', 'number_format', $test_item);
-        $this->assertAttributeEquals(true, 'is_dynamic', $test_item);
+        $reflection = new ReflectionClass($test_item);
+        $property = $reflection->getProperty('style');
+        $property->setAccessible(true);
+        $this->assertInstanceOf(TextStyle::class, $property->getValue($test_item));
+        $this->assertEquals('{page}', $reflection->getProperty('number_format')->getValue($test_item));
+        $this->assertTrue($reflection->getProperty('is_dynamic')->getValue($test_item));
     }
 
     public function test_setNumberFormat(): void
@@ -38,7 +41,8 @@ class PageNumberItemTest extends TestCase
         $test_item = $this->newPageNumber('default');
         $test_item->setNumberFormat('{page} / {total}');
 
-        $this->assertAttributeEquals('{page} / {total}', 'number_format', $test_item);
+        $reflection = new ReflectionClass($test_item);
+        $this->assertEquals('{page} / {total}', $reflection->getProperty('number_format')->getValue($test_item));
     }
 
     public function test_getNumberFormat(): void
