@@ -17,7 +17,7 @@ use Thinreports\Exception\UnavailableStyleValue;
  */
 class TextStyle extends BasicStyle
 {
-    static protected $available_style_names = array(
+    static protected array $available_style_names = array(
         'bold', 'italic', 'underline', 'linethrough',
         'align', 'valign', 'color', 'font_size'
     );

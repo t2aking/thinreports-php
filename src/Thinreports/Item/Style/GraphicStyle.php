@@ -14,7 +14,7 @@ namespace Thinreports\Item\Style;
  */
 class GraphicStyle extends BasicStyle
 {
-    static protected $available_style_names = array(
+    static protected array $available_style_names = array(
         'border_color',
         'border_width',
         'border',
@@ -24,7 +24,7 @@ class GraphicStyle extends BasicStyle
     /**
      * @param float|integer $width
      */
-    public function set_border_width($width): void
+    public function set_border_width(float|int $width): void
     {
         $this->styles['border-width'] = $width;
     }
@@ -32,7 +32,7 @@ class GraphicStyle extends BasicStyle
     /**
      * @return float|integer
      */
-    public function get_border_width()
+    public function get_border_width(): float|int
     {
         return $this->readStyle('border-width');
     }

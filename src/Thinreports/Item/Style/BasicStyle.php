@@ -17,8 +17,8 @@ use Thinreports\Exception\StandardException;
  */
 class BasicStyle
 {
-    static protected $available_style_names = array();
-    protected $styles;
+    static protected array $available_style_names = array();
+    protected array $styles;
 
     /**
      * @param array $item_styles
@@ -33,7 +33,7 @@ class BasicStyle
      * @param mixed $value
      * @throws StandardException
      */
-    public function set(string $style_name, $value): void
+    public function set(string $style_name, mixed $value): void
     {
         $this->verifyStyleName($style_name);
 
@@ -66,7 +66,7 @@ class BasicStyle
      * @param string $raw_style_name
      * @return mixed
      */
-    public function readStyle(string $raw_style_name)
+    public function readStyle(string $raw_style_name): mixed
     {
         if (array_key_exists($raw_style_name, $this->styles)) {
             return $this->styles[$raw_style_name];
@@ -96,7 +96,7 @@ class BasicStyle
      * @param array $allows
      * @throws Exception\UnavailableStyleValue
      */
-    public function verifyStyleValue(string $style_name, $value, array $allows): void
+    public function verifyStyleValue(string $style_name, mixed $value, array $allows): void
     {
         if (!in_array($value, $allows, true)) {
             throw new Exception\UnavailableStyleValue($style_name, $value, $allows);
