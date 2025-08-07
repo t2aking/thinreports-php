@@ -34,7 +34,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
         return $formats;
     }
 
-    function dataItemFormats(array $item_name_and_keys)
+    public function dataItemFormats(array $item_name_and_keys): array
     {
         $formats = array();
 
