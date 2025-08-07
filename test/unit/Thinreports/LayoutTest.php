@@ -1,11 +1,10 @@
 <?php
 namespace Thinreports;
 
+use JsonException;
 use ReflectionClass;
 use ReflectionException;
-use Thinreports\Exception;
 use Thinreports\Exception\StandardException;
-use Thinreports\Item;
 
 class LayoutTest extends TestCase
 {
@@ -36,7 +35,7 @@ class LayoutTest extends TestCase
     }
 
     /**
-     * @throws ReflectionException
+     * @throws ReflectionException|JsonException
      */
     public function test_loadData(): void
     {
@@ -50,7 +49,6 @@ class LayoutTest extends TestCase
         $this->assertNotNull($layout);
         $reflection = new ReflectionClass($layout);
         $property = $reflection->getProperty('identifier');
-        $property->setAccessible(true);
         $this->assertEquals(md5($schema_data), $property->getValue($layout));
     }
 
@@ -61,6 +59,7 @@ class LayoutTest extends TestCase
             $this->fail();
         } catch (Exception\IncompatibleLayout $e) {
             // OK
+        } catch (JsonException $e) {
         }
 
         try {
@@ -68,12 +67,14 @@ class LayoutTest extends TestCase
             $this->fail();
         } catch (Exception\IncompatibleLayout $e) {
             // OK
+        } catch (JsonException $e) {
         }
 
         try {
             $schema = Layout::parse('{"version":"0.9.0", "items":[]}');
         } catch (Exception\IncompatibleLayout $e) {
             $this->fail($e->getMessage());
+        } catch (JsonException $e) {
         }
 
         $this->assertSame(array('version' => '0.9.0', 'items' => array()), $schema);
@@ -82,6 +83,7 @@ class LayoutTest extends TestCase
             $schema = Layout::parse('{"version":"0.9.0", "items":[{"id": "", "type": "image", "x": 0.0, "y": 0.0, "width": 592.6, "height": 764.5, "display": true}]}');
         } catch (Exception\IncompatibleLayout $e) {
             $this->fail($e->getMessage());
+        } catch (JsonException $e) {
         }
 
         $items = [
@@ -101,6 +103,7 @@ class LayoutTest extends TestCase
             $schema = Layout::parse('{"version":"0.9.0", "items":[{"id": "test_id", "type": "image", "x": 0.0, "y": 0.0, "width": 592.6, "height": 764.5, "display": true}]}');
         } catch (Exception\IncompatibleLayout $e) {
             $this->fail($e->getMessage());
+        } catch (JsonException $e) {
         }
 
         $items = [
@@ -133,13 +136,10 @@ class LayoutTest extends TestCase
 
         $reflection = new ReflectionClass($layout);
         $property = $reflection->getProperty('schema');
-        $property->setAccessible(true);
         $this->assertEquals($schema, $property->getValue($layout));
         $property = $reflection->getProperty('identifier');
-        $property->setAccessible(true);
         $this->assertEquals('layout_identifier', $property->getValue($layout));
         $property = $reflection->getProperty('item_schemas');
-        $property->setAccessible(true);
         $this->assertEquals(
             array(
                 'with_id' => array(
