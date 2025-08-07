@@ -77,7 +77,7 @@ class PDFAnalyzer
     public function isEmptyPage($page_number): bool
     {
         $texts = str_replace(
-            "\nPowered by TCPDF (www.tcpdf.org) ", '',
+            "Powered by TCPDF (www.tcpdf.org) ", '',
             $this->getTextsInPage($page_number)
         );
         return $texts === ' ' || $texts === '';
