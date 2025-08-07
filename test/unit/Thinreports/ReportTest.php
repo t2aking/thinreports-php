@@ -188,7 +188,6 @@ class ReportTest extends TestCase
         $report = $this->createReport($this->dataLayoutFile('empty_A4P.tlf'));
         $reflection = new ReflectionClass($report);
         $property = $reflection->getProperty('default_layout');
-        $property->setAccessible(true);
         $this->assertEquals($report->getDefaultLayout(), $property->getValue($report));
     }
 
@@ -200,7 +199,6 @@ class ReportTest extends TestCase
         $reflection = new ReflectionClass($report);
 
         $property = $reflection->getProperty('layouts');
-        $property->setAccessible(true);
         $this->assertCount(0, $property->getValue($report));
 
         try {

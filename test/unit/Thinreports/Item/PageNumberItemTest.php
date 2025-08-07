@@ -30,7 +30,6 @@ class PageNumberItemTest extends TestCase
 
         $reflection = new ReflectionClass($test_item);
         $property = $reflection->getProperty('style');
-        $property->setAccessible(true);
         $this->assertInstanceOf(TextStyle::class, $property->getValue($test_item));
         $this->assertEquals('{page}', $reflection->getProperty('number_format')->getValue($test_item));
         $this->assertTrue($reflection->getProperty('is_dynamic')->getValue($test_item));

@@ -68,7 +68,6 @@ class PageTest extends TestCase
 
         $reflection = new ReflectionClass($page);
         $property = $reflection->getProperty('items');
-        $property->setAccessible(true);
         $this->assertCount(0, $property->getValue($page));
 
         $this->assertInstanceOf(TextBlockItem::class,

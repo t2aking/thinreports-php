@@ -37,10 +37,8 @@ class TextBlockItemTest extends TestCase
 
         $reflection = new ReflectionClass($text_block);
         $property = $reflection->getProperty('style');
-        $property->setAccessible(true);
         $this->assertInstanceOf(TextStyle::class, $property->getValue($text_block));
         $property = $reflection->getProperty('formatter');
-        $property->setAccessible(true);
         $this->assertInstanceOf(TextFormatter::class, $property->getValue($text_block));
         $this->assertEmpty($text_block->getValue());
         $this->assertFalse($reflection->getProperty('format_enabled')->getValue($text_block));
@@ -53,7 +51,6 @@ class TextBlockItemTest extends TestCase
         $text_block = $this->newTextBlock('with_reference_to_default');
 
         $property = $reflection->getProperty('reference_item');
-        $property->setAccessible(true);
         $this->assertInstanceOf(TextBlockItem::class, $property->getValue($text_block));
     }
 
@@ -110,7 +107,6 @@ class TextBlockItemTest extends TestCase
         $text_block->setFormatEnabled(false);
         $reflection = new ReflectionClass($text_block);
         $property = $reflection->getProperty('format_enabled');
-        $property->setAccessible(true);
         $this->assertFalse($property->getValue($text_block));
 
         $text_block->setFormatEnabled(true);

@@ -28,7 +28,6 @@ class ImageBlockItemTest extends TestCase
         $test_item = $this->newImageBlock();
         $reflection = new ReflectionClass($test_item);
         $property = $reflection->getProperty('style');
-        $property->setAccessible(true);
         $this->assertInstanceOf(BasicStyle::class, $property->getValue($test_item));
     }
 

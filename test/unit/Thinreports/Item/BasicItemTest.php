@@ -29,20 +29,17 @@ class BasicItemTest extends TestCase
         $item = $this->newBasicItem('image');
         $reflection = new ReflectionClass($item);
         $property = $reflection->getProperty('style');
-        $property->setAccessible(true);
         $this->assertInstanceOf(BasicStyle::class, $property->getValue($item));
 
         $item = $this->newBasicItem('text');
         $reflection = new ReflectionClass($item);
         $property = $reflection->getProperty('style');
-        $property->setAccessible(true);
         $this->assertInstanceOf(TextStyle::class, $property->getValue($item));
 
         foreach (array('line', 'rect', 'ellipse') as $schema_data_name) {
             $item = $this->newBasicItem($schema_data_name);
             $reflection = new ReflectionClass($item);
             $property = $reflection->getProperty('style');
-            $property->setAccessible(true);
             $this->assertInstanceOf(GraphicStyle::class, $property->getValue($item));
         }
     }
