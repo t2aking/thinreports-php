@@ -10,11 +10,10 @@
 namespace Thinreports\Item;
 
 use Thinreports\Page\Page;
-use Thinreports\Item\Style;
 
 class BasicItem extends AbstractItem
 {
-    const TYPE_NAME = 'basic';
+    public const TYPE_NAME = 'basic';
 
     /**
      * {@inheritdoc}
@@ -23,17 +22,11 @@ class BasicItem extends AbstractItem
     {
         parent::__construct($parent, $schema);
 
-        switch (true) {
-            case $this->isImage():
-                $this->style = new Style\BasicStyle($schema);
-                break;
-            case $this->isText():
-                $this->style = new Style\TextStyle($schema);
-                break;
-            default:
-                $this->style = new Style\GraphicStyle($schema);
-                break;
-        }
+        $this->style = match (true) {
+            $this->isImage() => new Style\BasicStyle($schema),
+            $this->isText() => new Style\TextStyle($schema),
+            default => new Style\GraphicStyle($schema),
+        };
     }
 
     /**
@@ -101,30 +94,26 @@ class BasicItem extends AbstractItem
     {
         $schema = $this->getSchema();
 
-        switch (true) {
-            case $this->isImage() || $this->isRect() || $this->isText():
-                return array(
-                    'x'      => $schema['x'],
-                    'y'      => $schema['y'],
-                    'width'  => $schema['width'],
-                    'height' => $schema['height']
-                );
-            case $this->isEllipse():
-                return array(
-                    'cx' => $schema['cx'],
-                    'cy' => $schema['cy'],
-                    'rx' => $schema['rx'],
-                    'ry' => $schema['ry']
-                );
-            case $this->isLine():
-                return array(
-                    'x1' => $schema['x1'],
-                    'y1' => $schema['y1'],
-                    'x2' => $schema['x2'],
-                    'y2' => $schema['y2']
-                );
-            default:
-                return [];
-        }
+        return match (true) {
+            $this->isImage() || $this->isRect() || $this->isText() => array(
+                'x' => $schema['x'],
+                'y' => $schema['y'],
+                'width' => $schema['width'],
+                'height' => $schema['height']
+            ),
+            $this->isEllipse() => array(
+                'cx' => $schema['cx'],
+                'cy' => $schema['cy'],
+                'rx' => $schema['rx'],
+                'ry' => $schema['ry']
+            ),
+            $this->isLine() => array(
+                'x1' => $schema['x1'],
+                'y1' => $schema['y1'],
+                'x2' => $schema['x2'],
+                'y2' => $schema['y2']
+            ),
+            default => [],
+        };
     }
 }

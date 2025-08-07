@@ -12,16 +12,15 @@ namespace Thinreports\Item;
 use Thinreports\Exception\StandardException;
 use Thinreports\Page\Page;
 use Thinreports\Item\Style\TextStyle;
-use Thinreports\Item\TextFormatter;
 use Thinreports\Exception;
 
 class TextBlockItem extends AbstractBlockItem
 {
     public const TYPE_NAME = 'text-block';
 
-    private $format_enabled = null;
-    private $reference_item = null;
-    private $formatter;
+    private ?bool $format_enabled = null;
+    private ?AbstractItem $reference_item = null;
+    private TextFormatter $formatter;
 
     /**
      * {@inheritdoc}
@@ -46,7 +45,7 @@ class TextBlockItem extends AbstractBlockItem
      * {@inheritdoc}
      * @throws Exception\StandardException
      */
-    public function setValue($value): AbstractBlockItem
+    public function setValue(mixed $value): AbstractBlockItem
     {
         if ($this->hasReference()) {
             throw new Exception\StandardException('Readonly Item', $this->getId(),
@@ -104,7 +103,7 @@ class TextBlockItem extends AbstractBlockItem
      *
      * @return mixed
      */
-    public function getRealValue()
+    public function getRealValue(): mixed
     {
         if ($this->isFormatEnabled()) {
             return $this->formatter->format($this->getValue());

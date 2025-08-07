@@ -10,7 +10,7 @@ namespace Thinreports\Item;
 
 class TextFormatter
 {
-    private $format;
+    private array $format;
 
     public function __construct(array $format)
     {
@@ -21,7 +21,7 @@ class TextFormatter
      * @param mixed $value
      * @return mixed
      */
-    public function format($value)
+    public function format(mixed $value): mixed
     {
         if ($value === null || $value === '') {
             return $value;
@@ -53,7 +53,7 @@ class TextFormatter
      * @param mixed $value
      * @return mixed
      */
-    private function applyNumberFormat($value)
+    private function applyNumberFormat(mixed $value): mixed
     {
         if (!is_numeric($value)) {
             return $value;
@@ -72,7 +72,7 @@ class TextFormatter
      * @param mixed $value
      * @return mixed
      */
-    private function applyDateTimeFormat($value)
+    private function applyDateTimeFormat(mixed $value): mixed
     {
         $datetime_format = $this->format['datetime'];
 
@@ -95,11 +95,11 @@ class TextFormatter
      * @param mixed $value
      * @return mixed
      */
-    private function applyPaddingFormat($value)
+    private function applyPaddingFormat(mixed $value): mixed
     {
         $padding_format = $this->format['padding'];
 
-        $character = $padding_format['char'];
+        $character = $padding_format['char'] ?? null;
         $direction = $padding_format['direction'];
         $length = (int)$padding_format['length'];
 
@@ -119,7 +119,7 @@ class TextFormatter
      * @param mixed $value
      * @return mixed
      */
-    private function applyBaseFormat($value)
+    private function applyBaseFormat(mixed $value): mixed
     {
         $base_format = $this->format['base'];
         $pattern = '/\{value}/';
@@ -137,10 +137,10 @@ class TextFormatter
      * @param string $direction Possible types are "L" or "R"
      * @param string $string
      * @param string $padstr
-     * @param string|integer $length
+     * @param integer|string $length
      * @return string
      */
-    private function padChars(string $direction, string $string, string $padstr, $length): string
+    private function padChars(string $direction, string $string, string $padstr, int|string $length): string
     {
         while (mb_strlen($string, 'UTF-8') < $length) {
             if ($direction === 'L') {
