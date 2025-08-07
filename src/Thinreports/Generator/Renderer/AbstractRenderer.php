@@ -36,9 +36,9 @@ abstract class AbstractRenderer
     public function buildGraphicStyles(array $styles): array
     {
         return array(
-            'stroke_color' => $styles['border-color'],
-            'stroke_width' => $styles['border-width'],
-            'stroke_dash'  => $styles['border-style'],
+            'stroke_color' => $styles['border-color'] ?? '',
+            'stroke_width' => $styles['border-width'] ?? '',
+            'stroke_dash'  => $styles['border-style'] ?? '',
             'fill_color'   => $styles['fill-color'] ?? ''
         );
     }
