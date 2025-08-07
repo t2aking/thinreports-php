@@ -23,26 +23,27 @@ class PDFGenerator
     /**
      * @var Report
      */
-    private $report;
+    private Report $report;
 
     /**
      * @var Renderer\LayoutRenderer[]
      */
-    private $layout_renderers = array();
+    private array $layout_renderers = array();
 
     /**
      * @var Renderer\ItemRenderer
      */
-    private $item_renderer;
+    private Renderer\ItemRenderer $item_renderer;
 
     /**
      * @var PDF\Document
      */
-    private $doc;
+    private PDF\Document $doc;
 
     /**
      * @param Report $report
      * @return string
+     * @throws StandardException
      */
     public static function generate(Report $report): string
     {
