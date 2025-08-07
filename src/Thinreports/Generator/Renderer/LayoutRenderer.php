@@ -123,7 +123,7 @@ class LayoutRenderer extends AbstractRenderer
     public function renderRect(array $attrs): void
     {
         $styles = $this->buildGraphicStyles($attrs['style']);
-        $styles['radius'] = $attrs['border-radius'];
+        $styles['radius'] = $attrs['border-radius'] ?? 0;
 
         $this->doc->graphics->drawRect(
             $attrs['x'],
