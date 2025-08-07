@@ -16,7 +16,7 @@ class PageNumberItem extends AbstractItem
 {
     public const TYPE_NAME = 'page-number';
 
-    private $number_format;
+    private mixed $number_format;
 
     /**
      * {@inheritdoc}
@@ -62,7 +62,7 @@ class PageNumberItem extends AbstractItem
      *
      * @return array|string|string[]
      */
-    public function getFormattedPageNumber()
+    public function getFormattedPageNumber(): array|string
     {
         if (!$this->isForReport()) {
             return '';

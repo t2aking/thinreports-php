@@ -8,7 +8,7 @@ class TestBlockItem extends AbstractBlockItem {}
 
 class AbstractBlockItemTest extends TestCase
 {
-    private $test_item;
+    private TestBlockItem $test_item;
 
     public function setup(): void
     {
@@ -28,7 +28,7 @@ class AbstractBlockItemTest extends TestCase
     public function test_setValue(): void
     {
         $this->test_item->setValue(1000);
-        $this->assertAttributeEquals(1000, 'value', $this->test_item);
+        $this->assertEquals(1000, $this->test_item->getValue());
     }
 
     public function test_getValue(): void

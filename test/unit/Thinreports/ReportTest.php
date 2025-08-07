@@ -1,6 +1,8 @@
 <?php
 namespace Thinreports;
 
+use ReflectionClass;
+
 class ReportTest extends TestCase
 {
     private function createReport($layout_filename = null): Report
@@ -184,7 +186,9 @@ class ReportTest extends TestCase
     public function test_getDefaultLayout(): void
     {
         $report = $this->createReport($this->dataLayoutFile('empty_A4P.tlf'));
-        $this->assertAttributeSame($report->getDefaultLayout(), 'default_layout', $report);
+        $reflection = new ReflectionClass($report);
+        $property = $reflection->getProperty('default_layout');
+        $this->assertEquals($report->getDefaultLayout(), $property->getValue($report));
     }
 
     public function test_buildLayout(): void
@@ -192,21 +196,24 @@ class ReportTest extends TestCase
         $report = $this->createReport();
         $layout_filename = $this->dataLayoutFile('empty_A4P.tlf');
 
-        $this->assertAttributeCount(0, 'layouts', $report);
+        $reflection = new ReflectionClass($report);
+
+        $property = $reflection->getProperty('layouts');
+        $this->assertCount(0, $property->getValue($report));
 
         try {
             $layout1st = $report->buildLayout($layout_filename);
         } catch (Exception\StandardException $e) {
             $this->fail($e->getMessage());
         }
-        $this->assertAttributeCount(1, 'layouts', $report);
+        $this->assertCount(1, $property->getValue($report));
 
         try {
             $layout2nd = $report->buildLayout($layout_filename);
         } catch (Exception\StandardException $e) {
             $this->fail($e->getMessage());
         }
-        $this->assertAttributeCount(1, 'layouts', $report);
+        $this->assertCount(1, $property->getValue($report));
         $this->assertSame($layout1st, $layout2nd);
     }
 

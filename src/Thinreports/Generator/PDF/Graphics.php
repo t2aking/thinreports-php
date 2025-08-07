@@ -9,37 +9,39 @@
 
 namespace Thinreports\Generator\PDF;
 
+use TCPDF;
+
 /**
  * @access private
  */
 class Graphics
 {
-    static private $pdf_image_align = array(
+    static private array $pdf_image_align = array(
         'left'   => 'L',
         'center' => 'C',
         'right'  => 'R'
     );
 
-    static private $pdf_image_valign = array(
+    static private array $pdf_image_valign = array(
         'top'    => 'T',
         'middle' => 'M',
         'bottom' => 'B'
     );
 
     /**
-     * @var \TCPDF
+     * @var TCPDF
      */
-    private $pdf;
+    private TCPDF $pdf;
 
     /**
      * @var string[]
      */
-    private $image_registry = array();
+    private array $image_registry = array();
 
     /**
-     * @param \TCPDF $pdf
+     * @param TCPDF $pdf
      */
-    public function __construct(\TCPDF $pdf)
+    public function __construct(TCPDF $pdf)
     {
         $this->pdf = $pdf;
     }
@@ -56,7 +58,7 @@ class Graphics
      * }
      * @see http://www.tcpdf.org/doc/code/classTCPDF.html
      */
-    public function drawLine($x1, $y1, $x2, $y2, array $attrs = array()): void
+    public function drawLine(float|string $x1, float|string $y1, float|string $x2, float|string $y2, array $attrs = array()): void
     {
         $style = $this->buildGraphicStyles($attrs);
 
@@ -81,7 +83,7 @@ class Graphics
      * }
      * @see http://www.tcpdf.org/doc/code/classTCPDF.html
      */
-    public function drawRect($x, $y, $width, $height, array $attrs = array()): void
+    public function drawRect(float|string $x, float|string $y, float|string $width, float|string $height, array $attrs = array()): void
     {
         $style = $this->buildGraphicStyles($attrs);
         $rendering_flag = $this->buildRenderingFlag($style['stroke'], $style['fill']);
@@ -108,7 +110,7 @@ class Graphics
      * }
      * @see http://www.tcpdf.org/doc/code/classTCPDF.html
      */
-    public function drawEllipse($cx, $cy, $rx, $ry, array $attrs = array()): void
+    public function drawEllipse(float|string $cx, float|string $cy, float|string $rx, float|string $ry, array $attrs = array()): void
     {
         $style = $this->buildGraphicStyles($attrs);
         $rendering_flag = $this->buildRenderingFlag($style['stroke'], $style['fill']);
@@ -129,7 +131,7 @@ class Graphics
      * }
      * @see http://www.tcpdf.org/doc/code/classTCPDF.html
      */
-    public function drawImage($filename, $x, $y, $width, $height, array $attrs = array()): void
+    public function drawImage(string $filename, float|string $x, float|string $y, float|string $width, float|string $height, array $attrs = array()): void
     {
         $position = $this->buildImagePosition($attrs);
 
@@ -160,7 +162,7 @@ class Graphics
      * @param float|string $height
      * @param array $attrs {@see self::drawImage()}
      */
-    public function drawBase64Image($base64_string, $x, $y, $width, $height, array $attrs = array()): void
+    public function drawBase64Image(string $base64_string, float|string $x, float|string $y, float|string $width, float|string $height, array $attrs = array()): void
     {
         $registry_key = md5($base64_string);
         $image_path = $this->getRegisteredImagePath($registry_key);

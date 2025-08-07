@@ -14,7 +14,7 @@ namespace Thinreports\Generator\PDF;
  */
 class ColorParser
 {
-    static private $color_names = array(
+    static private array $color_names = array(
         'red'     => 'ff0000',
         'yellow'  => 'fff000',
         'lime'    => '00ff00',

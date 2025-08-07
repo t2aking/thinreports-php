@@ -17,9 +17,9 @@ use Thinreports\Exception;
 
 class Page extends BlankPage
 {
-    private $report;
-    private $layout;
-    private $items = array();
+    private Report $report;
+    private Layout $layout;
+    private array $items = array();
 
     /**
      * @param Report $report

@@ -11,9 +11,9 @@ namespace Thinreports\Page;
 
 class BlankPage
 {
-    protected $number;
-    protected $is_blank = true;
-    protected $is_countable = true;
+    protected ?int $number;
+    protected bool $is_blank = true;
+    protected bool $is_countable = true;
 
     /**
      * @param int|null $page_number

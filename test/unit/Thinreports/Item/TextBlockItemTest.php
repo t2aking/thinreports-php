@@ -1,6 +1,7 @@
 <?php
 namespace Thinreports\Item;
 
+use ReflectionClass;
 use Thinreports\Exception\StandardException;
 use Thinreports\TestCase;
 use Thinreports\Report;
@@ -8,12 +9,10 @@ use Thinreports\Layout;
 use Thinreports\Page\Page;
 use Thinreports\Exception;
 use Thinreports\Item\Style\TextStyle;
-use Thinreports\Item\TextFormatter;
-use Thinreports\Item\TextBlockItem;
 
 class TextBlockItemTest extends TestCase
 {
-    private $page;
+    private Page $page;
 
     public function setup(): void
     {
@@ -36,20 +35,23 @@ class TextBlockItemTest extends TestCase
     {
         $text_block = $this->newTextBlock('default');
 
-        $this->assertAttributeInstanceOf(TextStyle::class, 'style', $text_block);
-        $this->assertAttributeInstanceOf(TextFormatter::class, 'formatter', $text_block);
-        $this->assertAttributeSame('', 'value', $text_block);
-        $this->assertAttributeSame(false, 'format_enabled', $text_block);
-        $this->assertAttributeSame(null, 'reference_item', $text_block);
+        $reflection = new ReflectionClass($text_block);
+        $property = $reflection->getProperty('style');
+        $this->assertInstanceOf(TextStyle::class, $property->getValue($text_block));
+        $property = $reflection->getProperty('formatter');
+        $this->assertInstanceOf(TextFormatter::class, $property->getValue($text_block));
+        $this->assertEmpty($text_block->getValue());
+        $this->assertFalse($reflection->getProperty('format_enabled')->getValue($text_block));
+        $this->assertNull($reflection->getProperty('reference_item')->getValue($text_block));
 
         $text_block = $this->newTextBlock('with_default_value');
 
-        $this->assertAttributeSame('10000', 'value', $text_block);
+        $this->assertEquals('10000', $text_block->getValue());
 
         $text_block = $this->newTextBlock('with_reference_to_default');
 
-        $this->assertAttributeInstanceOf(TextBlockItem::class,
-            'reference_item', $text_block);
+        $property = $reflection->getProperty('reference_item');
+        $this->assertInstanceOf(TextBlockItem::class, $property->getValue($text_block));
     }
 
     /**
@@ -60,7 +62,7 @@ class TextBlockItemTest extends TestCase
         $text_block = $this->newTextBlock('default');
 
         $text_block->setValue('New value');
-        $this->assertAttributeEquals('New value', 'value', $text_block);
+        $this->assertEquals('New value', $text_block->getValue());
 
         $this->assertSame($text_block, $text_block->setValue('foo'));
 
@@ -103,10 +105,12 @@ class TextBlockItemTest extends TestCase
         $text_block = $this->newTextBlock('with_number_formatting');
 
         $text_block->setFormatEnabled(false);
-        $this->assertAttributeSame(false, 'format_enabled', $text_block);
+        $reflection = new ReflectionClass($text_block);
+        $property = $reflection->getProperty('format_enabled');
+        $this->assertFalse($property->getValue($text_block));
 
         $text_block->setFormatEnabled(true);
-        $this->assertAttributeSame(true, 'format_enabled', $text_block);
+        $this->assertTrue($property->getValue($text_block));
 
         $this->assertSame($text_block, $text_block->setFormatEnabled(false));
 

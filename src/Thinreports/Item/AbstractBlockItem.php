@@ -11,13 +11,13 @@ namespace Thinreports\Item;
 
 abstract class AbstractBlockItem extends AbstractItem
 {
-    private $value = '';
+    private mixed $value = '';
 
     /**
      * @param mixed $value
      * @return $this
      */
-    public function setValue($value): AbstractBlockItem
+    public function setValue(mixed $value): AbstractBlockItem
     {
         $this->value = $value;
         return $this;

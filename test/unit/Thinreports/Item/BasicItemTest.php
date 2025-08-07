@@ -1,6 +1,7 @@
 <?php
 namespace Thinreports\Item;
 
+use ReflectionClass;
 use Thinreports\TestCase;
 use Thinreports\Report;
 use Thinreports\Page\Page;
@@ -26,17 +27,20 @@ class BasicItemTest extends TestCase
     public function test_initialize(): void
     {
         $item = $this->newBasicItem('image');
-        $this->assertAttributeInstanceOf(BasicStyle::class,
-            'style', $item);
+        $reflection = new ReflectionClass($item);
+        $property = $reflection->getProperty('style');
+        $this->assertInstanceOf(BasicStyle::class, $property->getValue($item));
 
         $item = $this->newBasicItem('text');
-        $this->assertAttributeInstanceOf(TextStyle::class,
-            'style', $item);
+        $reflection = new ReflectionClass($item);
+        $property = $reflection->getProperty('style');
+        $this->assertInstanceOf(TextStyle::class, $property->getValue($item));
 
         foreach (array('line', 'rect', 'ellipse') as $schema_data_name) {
             $item = $this->newBasicItem($schema_data_name);
-            $this->assertAttributeInstanceOf(GraphicStyle::class,
-                'style', $item);
+            $reflection = new ReflectionClass($item);
+            $property = $reflection->getProperty('style');
+            $this->assertInstanceOf(GraphicStyle::class, $property->getValue($item));
         }
     }
 

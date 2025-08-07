@@ -1,6 +1,7 @@
 <?php
 namespace Thinreports\Page;
 
+use ReflectionClass;
 use Thinreports\Exception\StandardException;
 use Thinreports\Item\PageNumberItem;
 use Thinreports\TestCase;
@@ -14,9 +15,9 @@ use Thinreports\Item\BasicItem;
 
 class PageTest extends TestCase
 {
-    private $report;
-    private $layout;
-    private $item_schemas;
+    private Report $report;
+    private Layout $layout;
+    private array $item_schemas;
 
     public function setup(): void
     {
@@ -65,7 +66,9 @@ class PageTest extends TestCase
             $this->assertEquals('Item Not Found', $e->getSubject());
         }
 
-        $this->assertAttributeCount(0, 'items', $page);
+        $reflection = new ReflectionClass($page);
+        $property = $reflection->getProperty('items');
+        $this->assertCount(0, $property->getValue($page));
 
         $this->assertInstanceOf(TextBlockItem::class,
             $page->item('text_block_default'));
@@ -76,7 +79,7 @@ class PageTest extends TestCase
         $this->assertInstanceOf(BasicItem::class,
             $page->item('text_default'));
 
-        $this->assertAttributeCount(4, 'items', $page);
+        $this->assertCount(4, $property->getValue($page));
     }
 
     /**

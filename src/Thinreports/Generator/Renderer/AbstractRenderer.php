@@ -19,7 +19,7 @@ abstract class AbstractRenderer
     /**
      * @var PDF\Document
      */
-    protected $doc;
+    protected PDF\Document $doc;
 
     /**
      * @param PDF\Document $doc
@@ -36,10 +36,10 @@ abstract class AbstractRenderer
     public function buildGraphicStyles(array $styles): array
     {
         return array(
-            'stroke_color' => $styles['border-color'],
-            'stroke_width' => $styles['border-width'],
-            'stroke_dash'  => $styles['border-style'],
-            'fill_color'   => $styles['fill-color']
+            'stroke_color' => $styles['border-color'] ?? '',
+            'stroke_width' => $styles['border-width'] ?? '',
+            'stroke_dash'  => $styles['border-style'] ?? '',
+            'fill_color'   => $styles['fill-color'] ?? ''
         );
     }
 
@@ -76,8 +76,8 @@ abstract class AbstractRenderer
     {
         if (in_array($letter_spacing, array(null, 'auto', 'normal'), true)) {
             return null;
-        } else {
-            return $letter_spacing;
         }
+
+        return $letter_spacing;
     }
 }

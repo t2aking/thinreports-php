@@ -9,43 +9,44 @@
 
 namespace Thinreports\Generator\PDF;
 
+use TCPDF;
 use Thinreports\Layout;
 
 class Document
 {
     /**
-     * @var \TCPDF
+     * @var TCPDF
      */
-    private $pdf;
+    private TCPDF $pdf;
 
     /**
      * @var Graphics
      * @access public
      */
-    public $graphics;
+    public Graphics $graphics;
 
     /**
      * @var Text
      * @access public
      */
-    public $text;
+    public Text $text;
 
     /**
      * @var array
      */
-    private $page_formats = array();
+    private array $page_formats = array();
 
     /**
-     * @var Layout The layout that inserted at last.
+     * @var Layout|null The layout that inserted at last.
      */
-    private $last_page_layout = null;
+    private ?Layout $last_page_layout = null;
 
     /**
      * @param Layout|null $default_layout
      */
-    public function __construct(Layout $default_layout = null)
+    public function __construct(?Layout $default_layout = null)
     {
-        $this->pdf = new \TCPDF('P', 'pt', 'A4', true, 'UTF-8');
+        $this->pdf = new TCPDF('P', 'pt', 'A4', true, 'UTF-8');
 
         $this->pdf->SetCreator('Thinreports Generator');
         $this->pdf->SetAutoPageBreak(false);
@@ -103,23 +104,13 @@ class Document
         if ($layout->isUserPaperType()) {
             $size = $layout->getPageSize();
         } else {
-            switch ($layout->getPagePaperType()) {
-                case 'B4_ISO':
-                    $size = 'B4';
-                    break;
-                case 'B5_ISO':
-                    $size = 'B5';
-                    break;
-                case 'B4':
-                    $size = 'B4_JIS';
-                    break;
-                case 'B5':
-                    $size = 'B5_JIS';
-                    break;
-                default:
-                    $size = $layout->getPagePaperType();
-                    break;
-            }
+            $size = match ($layout->getPagePaperType()) {
+                'B4_ISO' => 'B4',
+                'B5_ISO' => 'B5',
+                'B4' => 'B4_JIS',
+                'B5' => 'B5_JIS',
+                default => $layout->getPagePaperType(),
+            };
         }
 
         return array(

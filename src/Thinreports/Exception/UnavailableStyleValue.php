@@ -16,7 +16,7 @@ class UnavailableStyleValue extends StandardException
      * @param mixed $value
      * @param array $available_values
      */
-    public function __construct($style_name, $value, array $available_values)
+    public function __construct(string $style_name, $value, array $available_values)
     {
         $message = $value . ' is not available for ' . $style_name . ' style. ' .
                    'Available values are ' . implode(', ', $available_values) . '.';

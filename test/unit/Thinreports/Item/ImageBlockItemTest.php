@@ -1,13 +1,15 @@
 <?php
 namespace Thinreports\Item;
 
+use ReflectionClass;
+use Thinreports\Page\Page;
 use Thinreports\TestCase;
 use Thinreports\Report;
 use Thinreports\Item\Style\BasicStyle;
 
 class ImageBlockItemTest extends TestCase
 {
-    private $page;
+    private Page $page;
 
     public function setup(): void
     {
@@ -24,8 +26,9 @@ class ImageBlockItemTest extends TestCase
     public function test_initialize(): void
     {
         $test_item = $this->newImageBlock();
-        $this->assertAttributeInstanceOf(BasicStyle::class,
-            'style', $test_item);
+        $reflection = new ReflectionClass($test_item);
+        $property = $reflection->getProperty('style');
+        $this->assertInstanceOf(BasicStyle::class, $property->getValue($test_item));
     }
 
     public function test_setSource(): void

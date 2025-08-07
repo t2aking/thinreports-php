@@ -9,7 +9,6 @@ default: &default
   width: 100
   height: 100
   display: true
-  value: ""
   multiple-line: false
   format:
     base: ""

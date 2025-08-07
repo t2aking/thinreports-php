@@ -13,12 +13,12 @@ use Thinreports\Page\Page;
 
 abstract class AbstractItem
 {
-    protected $parent;
-    protected $schema;
+    protected Page $parent;
+    protected array $schema;
 
-    protected $is_visible;
-    protected $is_dynamic;
-    protected $style;
+    protected bool $is_visible;
+    protected bool $is_dynamic;
+    protected mixed $style;
 
     /**
      * @param Page $parent
@@ -29,7 +29,7 @@ abstract class AbstractItem
         $this->parent = $parent;
         $this->schema = $schema;
         $this->is_visible = $schema['display'] === true;
-        $this->is_dynamic = $schema['id'] !== '';
+        $this->is_dynamic = array_key_exists('id', $schema) && $schema['id'] !== '';
     }
 
     /**
@@ -89,7 +89,7 @@ abstract class AbstractItem
      * @param mixed $style
      * @return $this
      */
-    public function setStyle(string $name, $style): AbstractItem
+    public function setStyle(string $name, mixed $style): AbstractItem
     {
         $this->style->set($name, $style);
         return $this;
@@ -108,9 +108,10 @@ abstract class AbstractItem
     }
 
     /**
+     * @param $name
      * @return mixed
      */
-    public function getStyle($name)
+    public function getStyle($name): mixed
     {
         return $this->style->get($name);
     }
