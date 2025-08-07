@@ -19,16 +19,16 @@ class Font
     /**
      * @var string[]
      */
-    static public $installed_builtin_fonts = array();
+    static public array $installed_builtin_fonts = array();
 
-    static public $builtin_unicode_fonts = array(
+    static public array $builtin_unicode_fonts = array(
         'IPAMincho'  => 'ipam.ttf',
         'IPAPMincho' => 'ipamp.ttf',
         'IPAGothic'  => 'ipag.ttf',
         'IPAPGothic' => 'ipagp.ttf'
     );
 
-    static public $builtin_font_aliases = array(
+    static public array $builtin_font_aliases = array(
         'Courier New'     => 'Courier',
         'Times New Roman' => 'Times'
     );

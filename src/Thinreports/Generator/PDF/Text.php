@@ -16,31 +16,31 @@ use TCPDF;
  */
 class Text
 {
-    static private $pdf_font_style = array(
+    static private array $pdf_font_style = array(
         'bold'          => 'B',
         'italic'        => 'I',
         'underline'     => 'U',
         'strikethrough' => 'D'
     );
 
-    static private $pdf_text_align = array(
+    static private array $pdf_text_align = array(
         'left'   => 'L',
         'center' => 'C',
         'right'  => 'R'
     );
 
-    static private $pdf_text_valign = array(
+    static private array $pdf_text_valign = array(
         'top'    => 'T',
         'center' => 'M',
         'bottom' => 'B'
     );
 
-    static private $pdf_default_line_height = 1;
+    static private int $pdf_default_line_height = 1;
 
     /**
      * @var TCPDF
      */
-    private $pdf;
+    private TCPDF $pdf;
 
     /**
      * @param TCPDF $pdf
@@ -70,7 +70,7 @@ class Text
      * }
      * @see http://www.tcpdf.org/doc/code/classTCPDF.html
      */
-    public function drawTextBox(string $content, $x, $y, $width, $height, array $attrs = array()): void
+    public function drawTextBox(string $content, float|string $x, float|string $y, float|string $width, float|string $height, array $attrs = array()): void
     {
         $styles = $this->buildTextBoxStyles($height, $attrs);
 
@@ -79,7 +79,7 @@ class Text
         }
 
         $this->setFontStyles($styles);
-        $this->pdf->setFontSpacing($styles['letter_spacing']);
+        $this->pdf->setFontSpacing(empty($styles['letter_spacing']) ? 0 : $styles['letter_spacing']);
         $this->pdf->setCellHeightRatio($styles['line_height']);
 
         $overflow = $styles['overflow'];
@@ -150,25 +150,25 @@ class Text
             $font_style[] = self::$pdf_font_style[$style];
         }
 
-        if (array_key_exists('line_height', $attrs)) {
+        if (array_key_exists('line_height', $attrs) && !empty($attrs['line_height'])) {
             $line_height = $attrs['line_height'];
         } else {
             $line_height = self::$pdf_default_line_height;
         }
 
-        if (array_key_exists('letter_spacing', $attrs)) {
+        if (array_key_exists('letter_spacing', $attrs) && !empty($attrs['letter_spacing'])) {
             $letter_spacing = $attrs['letter_spacing'];
         } else {
             $letter_spacing = 0;
         }
 
-        if (array_key_exists('align', $attrs)) {
+        if (array_key_exists('align', $attrs) && !empty($attrs['align'])) {
             $align = $attrs['align'];
         } else {
             $align = 'left';
         }
 
-        if (array_key_exists('valign', $attrs)) {
+        if (array_key_exists('valign', $attrs) && !empty($attrs['valign'])) {
             $valign = $attrs['valign'];
         } else {
             $valign = 'top';
@@ -197,7 +197,7 @@ class Text
      * @param array $attrs
      * @return array
      */
-    public function buildTextBoxStyles($box_height, array $attrs): array
+    public function buildTextBoxStyles(float|string $box_height, array $attrs): array
     {
         $is_single = array_key_exists('single_row', $attrs)
                      && $attrs['single_row'] === true;
