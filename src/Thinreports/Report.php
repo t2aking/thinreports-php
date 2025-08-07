@@ -119,7 +119,7 @@ class Report
      *
      * @return boolean|string
      */
-    public function generate(string $filename = null)
+    public function generate(string $filename = null): bool|string
     {
         $pdf_data = Generator\PDFGenerator::generate($this);
 
