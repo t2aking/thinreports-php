@@ -44,7 +44,7 @@ class Document
     /**
      * @param Layout|null $default_layout
      */
-    public function __construct(Layout $default_layout = null)
+    public function __construct(?Layout $default_layout = null)
     {
         $this->pdf = new TCPDF('P', 'pt', 'A4', true, 'UTF-8');
 

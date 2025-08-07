@@ -15,17 +15,17 @@ use Thinreports\Generator;
 
 class Report
 {
-    private $default_layout;
-    private $layouts = array();
+    private Layout $default_layout;
+    private array $layouts = array();
 
-    private $pages = array();
-    private $page_count = 0;
-    private $start_page_number = 1;
+    private array $pages = array();
+    private int $page_count = 0;
+    private int $start_page_number = 1;
 
     /**
      * @param string|null $default_layout_filename
      */
-    public function __construct(string $default_layout_filename = null)
+    public function __construct(?string $default_layout_filename = null)
     {
         if ($default_layout_filename !== null) {
             $this->default_layout = $this->buildLayout($default_layout_filename);
@@ -49,7 +49,7 @@ class Report
      *  $page->addPage(null, false);
      * @throws StandardException
      */
-    public function addPage(string $layout_filename = null, bool $countable = true): Page\Page
+    public function addPage(?string $layout_filename = null, bool $countable = true): Page\Page
     {
         $layout = $this->loadLayout($layout_filename);
         $page_number = $this->getNextPageNumber($countable);
@@ -119,7 +119,7 @@ class Report
      *
      * @return boolean|string
      */
-    public function generate(string $filename = null): bool|string
+    public function generate(?string $filename = null): bool|string
     {
         $pdf_data = Generator\PDFGenerator::generate($this);
 
@@ -163,13 +163,13 @@ class Report
      * @return Layout
      * @throws StandardException
      */
-    public function loadLayout(string $layout_filename = null): Layout
+    public function loadLayout(?string $layout_filename = null): Layout
     {
         if ($layout_filename !== null) {
             return $this->buildLayout($layout_filename);
         }
 
-        if ($this->default_layout === null) {
+        if (empty($this->default_layout)) {
             throw new Exception\StandardException('Layout Not Specified');
         }
 

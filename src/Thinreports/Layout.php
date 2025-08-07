@@ -9,14 +9,15 @@
 
 namespace Thinreports;
 
+use JsonException;
 use Thinreports\Exception\IncompatibleLayout;
 use Thinreports\Page\Page;
 
 class Layout
 {
-    public const FILE_EXT_NAME = 'tlf';
-    public const COMPATIBLE_VERSION_RANGE_START = '>= 0.8.2';
-    public const COMPATIBLE_VERSION_RANGE_END   = '< 1.0.0';
+    public const string FILE_EXT_NAME = 'tlf';
+    public const string COMPATIBLE_VERSION_RANGE_START = '>= 0.8.2';
+    public const string COMPATIBLE_VERSION_RANGE_END   = '< 1.0.0';
 
     /**
      * @param string $filename
@@ -39,7 +40,7 @@ class Layout
     /**
      * @param string $data
      * @return self
-     * @throws IncompatibleLayout
+     * @throws IncompatibleLayout|JsonException
      */
     public static function loadData(string $data): Layout
     {
@@ -54,11 +55,11 @@ class Layout
      *
      * @param string $file_content
      * @return array
-     * @throws Exception\IncompatibleLayout
+     * @throws Exception\IncompatibleLayout|JsonException
      */
     public static function parse(string $file_content): array
     {
-        $schema = json_decode($file_content, true);
+        $schema = json_decode($file_content, true, 512, JSON_THROW_ON_ERROR);
 
         if (!self::isCompatible($schema['version'])) {
             $rules = array(
@@ -161,7 +162,7 @@ class Layout
     /**
      * @return boolean
      */
-    public function isUserPaperType()
+    public function isUserPaperType(): bool
     {
         return $this->schema['report']['paper-type'] === 'user';
     }
