@@ -19,7 +19,7 @@ use Thinreports\Exception;
  */
 class LayoutRenderer extends AbstractRenderer
 {
-    private $items;
+    private array $items;
 
     /**
      * @param PDF\Document $doc
@@ -99,11 +99,7 @@ class LayoutRenderer extends AbstractRenderer
     {
         $styles = $this->buildTextStyles($attrs['style']);
 
-        if (array_key_exists('vertical-align', $attrs['style'])) {
-            $valign = $attrs['style']['vertical-align'];
-        } else {
-            $valign = null;
-        }
+        $valign = $attrs['style']['vertical-align'] ?? null;
         $styles['valign'] = $this->buildVerticalAlign($valign);
 
         if (array_key_exists('line-height', $attrs['style'])
