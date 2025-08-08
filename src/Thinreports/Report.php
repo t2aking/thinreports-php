@@ -15,7 +15,7 @@ use Thinreports\Generator;
 
 class Report
 {
-    private Layout $default_layout;
+    private ?Layout $default_layout = null;
     private array $layouts = array();
 
     private array $pages = array();
@@ -133,9 +133,9 @@ class Report
     /**
      * @access private
      *
-     * @return Layout
+     * @return ?Layout
      */
-    public function getDefaultLayout(): Layout
+    public function getDefaultLayout(): ?Layout
     {
         return $this->default_layout;
     }
