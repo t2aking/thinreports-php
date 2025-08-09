@@ -45,7 +45,10 @@ class LayoutRenderer extends AbstractRenderer
             $attributes = $item;
             $type = $item['type'];
 
-            if (!($type === 'text' || $type === 'image')) {
+            if (!($type === 'text' || $type === 'image' || $type === 'rect' || $type === 'ellipse' || $type === 'line')) {
+                continue;
+            }
+            if (!empty($item['id'])) {
                 continue;
             }
 
