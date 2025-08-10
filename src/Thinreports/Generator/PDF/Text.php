@@ -32,6 +32,7 @@ class Text
     static private array $pdf_text_valign = array(
         'top'    => 'T',
         'center' => 'M',
+        'middle' => 'M',
         'bottom' => 'B'
     );
 
