@@ -70,14 +70,15 @@ class LayoutTest extends TestCase
         } catch (JsonException $e) {
         }
 
+        $schema = null;
         try {
             $schema = Layout::parse('{"version":"0.9.0", "items":[]}');
-
-            $this->assertSame(array('version' => '0.9.0', 'items' => array()), $schema);
         } catch (Exception\IncompatibleLayout $e) {
             $this->fail($e->getMessage());
         } catch (JsonException $e) {
         }
+
+        $this->assertSame(array('version' => '0.9.0', 'items' => array()), $schema);
 
         try {
             $schema = Layout::parse('{"version":"0.9.0", "items":[{"id": "", "type": "image", "x": 0.0, "y": 0.0, "width": 592.6, "height": 764.5, "display": true}]}');

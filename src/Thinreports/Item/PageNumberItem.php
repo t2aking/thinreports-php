@@ -92,7 +92,7 @@ class PageNumberItem extends AbstractItem
     public function isForReport(): bool
     {
         $target = $this->schema['target'] ?? '';
-        return $target === '' || $target === null || $target === 'report';
+        return $target === '' || $target === 'report';
     }
 
     /**
