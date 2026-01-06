@@ -16,7 +16,7 @@ use Thinreports\Page\Page;
 class Layout
 {
     public const string FILE_EXT_NAME = 'tlf';
-    public const string COMPATIBLE_VERSION_RANGE_START = '>= 0.8.2';
+    public const string COMPATIBLE_VERSION_RANGE_START = '>= 0.9.0';
     public const string COMPATIBLE_VERSION_RANGE_END   = '< 1.0.0';
 
     /**

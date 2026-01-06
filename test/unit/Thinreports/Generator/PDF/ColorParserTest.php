@@ -1,20 +1,19 @@
 <?php
 namespace Thinreports\Generator\PDF;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Thinreports\TestCase;
 
 class ColorParserTest extends TestCase
 {
-    /**
-     * @dataProvider colorPatternProvider
-     */
+    #[DataProvider('colorPatternProvider')]
     public function test_parse($expected_result, $color): void
     {
         $actual = ColorParser::parse($color);
         $this->assertSame($expected_result, $actual);
     }
 
-    public function colorPatternProvider(): array
+    public static function colorPatternProvider(): array
     {
         return array(
             array(null, ''),

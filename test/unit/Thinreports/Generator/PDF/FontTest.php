@@ -1,6 +1,7 @@
 <?php
 namespace Thinreports\Generator\PDF;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Thinreports\TestCase;
 
 class FontTest extends TestCase
@@ -43,9 +44,7 @@ class FontTest extends TestCase
         $this->assertEquals('ipam', Font::getFontName('IPAMincho'));
     }
 
-    /**
-     * @dataProvider unicodeFontProvider
-     */
+    #[DataProvider('unicodeFontProvider')]
     public function test_installBuiltinFont($expected_result, $font_name): void
     {
         $actual = Font::installBuiltinFont($font_name);
@@ -53,7 +52,7 @@ class FontTest extends TestCase
         $this->assertEquals($expected_result, $actual);
         $this->assertContains($actual, Font::$installed_builtin_fonts);
     }
-    public function unicodeFontProvider(): array
+    public static function unicodeFontProvider(): array
     {
         return array(
             array('ipam', 'IPAMincho'),

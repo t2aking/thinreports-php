@@ -70,6 +70,7 @@ class LayoutTest extends TestCase
         } catch (JsonException $e) {
         }
 
+        $schema = null;
         try {
             $schema = Layout::parse('{"version":"0.9.0", "items":[]}');
         } catch (Exception\IncompatibleLayout $e) {

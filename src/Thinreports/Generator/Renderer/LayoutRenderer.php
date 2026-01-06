@@ -38,7 +38,6 @@ class LayoutRenderer extends AbstractRenderer
     public function parse(Layout $layout): array
     {
         $items = array();
-        $text_lines = array();
         $schema = $layout->getSchema();
 
         foreach ($schema['items'] as $item) {
@@ -53,10 +52,7 @@ class LayoutRenderer extends AbstractRenderer
             }
 
             if ($type === 'text') {
-                foreach ($item['texts'] as $text) {
-                    $text_lines[] = $text;
-                }
-                $attributes['content'] = implode("\n", $text_lines);
+                $attributes['content'] = implode("\n", $item['texts']);
             }
 
             $items[] = $attributes;

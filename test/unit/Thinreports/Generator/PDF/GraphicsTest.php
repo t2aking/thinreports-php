@@ -1,6 +1,7 @@
 <?php
 namespace Thinreports\Generator\PDF;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Thinreports\TestCase;
 
 class GraphicsTest extends TestCase
@@ -10,7 +11,7 @@ class GraphicsTest extends TestCase
     public function setup(): void
     {
         $this->tcpdf = $this->getMockBuilder('TCPDF')
-                            ->setMethods(array('Line', 'Rect', 'RoundedRect', 'Image', 'Ellipse'))
+                            ->onlyMethods(array('Line', 'Rect', 'RoundedRect', 'Image', 'Ellipse'))
                             ->getMock();
     }
 
@@ -246,12 +247,10 @@ class GraphicsTest extends TestCase
         );
 
         $test_graphics->clearRegisteredImages();
-        $this->assertFileNotExists($image_path);
+        $this->assertFileDoesNotExist($image_path);
     }
 
-    /**
-     * @dataProvider graphicStyleProvider
-     */
+    #[DataProvider('graphicStyleProvider')]
     public function test_buildGraphicStyles($expected_result, $attrs): void
     {
         $test_graphics = new Graphics($this->tcpdf);
@@ -261,7 +260,8 @@ class GraphicsTest extends TestCase
             $test_graphics->buildGraphicStyles($attrs)
         );
     }
-    public function graphicStyleProvider(): array
+
+    public static function graphicStyleProvider(): array
     {
         return array(
             array(

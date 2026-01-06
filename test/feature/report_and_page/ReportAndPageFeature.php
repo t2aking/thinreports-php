@@ -1,12 +1,13 @@
 <?php
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Thinreports\Exception\StandardException;
 
 require_once __DIR__ . '/../test_helper.php';
 
 class ReportAndPageFeature extends FeatureTest
 {
-    private $layout_geometries = array(
+    private const array LAYOUT_GEOMETRIES = array(
         'A3_portrait'  => array('width' => 841.89,  'height' => 1190.551),
         'A4_portrait'  => array('width' => 595.276, 'height' => 841.89),
         'A4_landscape' => array('width' => 841.89,  'height' => 595.276),
@@ -47,9 +48,7 @@ class ReportAndPageFeature extends FeatureTest
         $this->assertTrue($analyzer->isEmptyPage(3));
     }
 
-    /**
-     * @dataProvider pageFormatPatternProvider
-     */
+    #[DataProvider('pageFormatPatternProvider')]
     public function test_basicPageFormats($layout_filename, $layout_page_size): void
     {
         $report = new Thinreports\Report(__DIR__ . "/layouts/{$layout_filename}.tlf");
@@ -65,11 +64,11 @@ class ReportAndPageFeature extends FeatureTest
         $this->assertEquals($layout_page_size['width'], $page_size['width']);
         $this->assertEquals($layout_page_size['height'], $page_size['height']);
     }
-    public function pageFormatPatternProvider(): array
+    public static function pageFormatPatternProvider(): array
     {
         $page_formats = array();
 
-        foreach ($this->layout_geometries as $filename => $size) {
+        foreach (self::LAYOUT_GEOMETRIES as $filename => $size) {
             $page_formats[] = array($filename, $size);
         }
         # It will returns like this:
@@ -85,7 +84,7 @@ class ReportAndPageFeature extends FeatureTest
     {
         $report = new Thinreports\Report(__DIR__ . '/layouts/A4_landscape.tlf');
 
-        foreach (array_keys($this->layout_geometries) as $filename) {
+        foreach (array_keys(self::LAYOUT_GEOMETRIES) as $filename) {
             try {
                 $report->addPage(__DIR__ . "/layouts/{$filename}.tlf");
                 # Insert a blank page
@@ -105,15 +104,15 @@ class ReportAndPageFeature extends FeatureTest
         $analyzer = $this->analyzePDF($report->generate());
 
         $expected_page_formats = array(
-            array('size' => $this->layout_geometries['A3_portrait'],  'is_blank' => false),
-            array('size' => $this->layout_geometries['A3_portrait'],  'is_blank' => true),
-            array('size' => $this->layout_geometries['A4_portrait'],  'is_blank' => false),
-            array('size' => $this->layout_geometries['A4_portrait'],  'is_blank' => true),
-            array('size' => $this->layout_geometries['A4_landscape'], 'is_blank' => false),
-            array('size' => $this->layout_geometries['A4_landscape'], 'is_blank' => true),
-            array('size' => $this->layout_geometries['user_400x400'], 'is_blank' => false),
-            array('size' => $this->layout_geometries['user_400x400'], 'is_blank' => true),
-            array('size' => $this->layout_geometries['A4_landscape'], 'is_blank' => false)
+            array('size' => self::LAYOUT_GEOMETRIES['A3_portrait'],  'is_blank' => false),
+            array('size' => self::LAYOUT_GEOMETRIES['A3_portrait'],  'is_blank' => true),
+            array('size' => self::LAYOUT_GEOMETRIES['A4_portrait'],  'is_blank' => false),
+            array('size' => self::LAYOUT_GEOMETRIES['A4_portrait'],  'is_blank' => true),
+            array('size' => self::LAYOUT_GEOMETRIES['A4_landscape'], 'is_blank' => false),
+            array('size' => self::LAYOUT_GEOMETRIES['A4_landscape'], 'is_blank' => true),
+            array('size' => self::LAYOUT_GEOMETRIES['user_400x400'], 'is_blank' => false),
+            array('size' => self::LAYOUT_GEOMETRIES['user_400x400'], 'is_blank' => true),
+            array('size' => self::LAYOUT_GEOMETRIES['A4_landscape'], 'is_blank' => false)
         );
 
         foreach ($expected_page_formats as $index => $expected_page_format) {
