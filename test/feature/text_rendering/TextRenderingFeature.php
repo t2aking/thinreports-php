@@ -55,7 +55,7 @@ class TextRenderingFeature extends FeatureTest
             'IPA 明朝'
         );
         foreach ($expected_texts as $text) {
-            $this->assertContains($text, $page_texts);
+            $this->assertStringContainsString($text, $page_texts);
         }
 
         $expected_fonts = array(

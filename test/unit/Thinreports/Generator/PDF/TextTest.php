@@ -1,6 +1,7 @@
 <?php
 namespace Thinreports\Generator\PDF;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Thinreports\TestCase;
 
 class TextTest extends TestCase
@@ -10,7 +11,7 @@ class TextTest extends TestCase
     public function setup(): void
     {
         $this->tcpdf = $this->getMockBuilder('TCPDF')
-                            ->setMethods(array(
+                            ->onlyMethods(array(
                                 'SetFont',
                                 'SetTextColorArray',
                                 'setFontSpacing',
@@ -129,9 +130,7 @@ class TextTest extends TestCase
         ));
     }
 
-    /**
-     * @dataProvider boxAttributesProvider
-     */
+    #[DataProvider('boxAttributesProvider')]
     public function test_buildTextBoxStyles($expected_styles, $box_attrs): void
     {
         $test_text = new Text($this->tcpdf);
@@ -140,7 +139,7 @@ class TextTest extends TestCase
             $test_text->buildTextBoxStyles(100, $box_attrs)
         );
     }
-    public function boxAttributesProvider(): array
+    public static function boxAttributesProvider(): array
     {
         $correct_text_attrs = array(
             'result' => array(
@@ -256,15 +255,13 @@ class TextTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider textAttributesProvider
-     */
+    #[DataProvider('textAttributesProvider')]
     public function test_buildTextStyles($expected_styles, $text_attrs): void
     {
         $test_text = new Text($this->tcpdf);
         $this->assertSame($expected_styles, $test_text->buildTextStyles($text_attrs));
     }
-    public function textAttributesProvider(): array
+    public static function textAttributesProvider(): array
     {
         $case1 = array(
             array(
