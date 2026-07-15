@@ -204,18 +204,14 @@ class ItemRenderer extends AbstractRenderer
      */
     public function renderRectItem(Item\BasicItem $item): void
     {
-//        $schema = $item->getSchema();
         $bounds = $item->getBounds();
-
-//        $styles = $this->buildGraphicStyles($schema);
-//        $styles['radius'] = $schema['border-radius'];
 
         $this->doc->graphics->drawRect(
             $bounds['x'],
             $bounds['y'],
             $bounds['width'],
             $bounds['height'],
-            $this->buildGraphicStyles($item->exportStyles())
+            $this->buildBasicItemGraphicStyles($item)
         );
     }
 
@@ -231,7 +227,7 @@ class ItemRenderer extends AbstractRenderer
             $bounds['cy'],
             $bounds['rx'],
             $bounds['ry'],
-            $this->buildGraphicStyles($item->exportStyles())
+            $this->buildBasicItemGraphicStyles($item)
         );
     }
 
@@ -247,8 +243,16 @@ class ItemRenderer extends AbstractRenderer
             $bounds['y1'],
             $bounds['x2'],
             $bounds['y2'],
-            $this->buildGraphicStyles($item->exportStyles())
+            $this->buildBasicItemGraphicStyles($item)
         );
+    }
+
+    private function buildBasicItemGraphicStyles(Item\BasicItem $item): array
+    {
+        $schema = $item->getSchema();
+        $styles = array_merge($schema['style'], $item->exportStyles());
+
+        return $this->buildGraphicStyles($styles);
     }
 
     /**

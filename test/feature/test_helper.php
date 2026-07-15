@@ -74,6 +74,11 @@ class PDFAnalyzer
         );
     }
 
+    public function getRawContentInPage($page_number): string
+    {
+        return $this->pages[$page_number - 1]->get('Contents')->getContent();
+    }
+
     public function isEmptyPage($page_number): bool
     {
         $texts = str_replace(
