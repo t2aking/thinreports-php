@@ -18,6 +18,18 @@ class TextRenderingFeature extends FeatureTest
         $this->assertRenderingTextAndFont($report);
     }
 
+    public function test_staticTextWithIdRendering(): void
+    {
+        $report = new Thinreports\Report(__DIR__ . '/layouts/static_text_with_id.tlf');
+        $page = $report->addPage();
+        $page->item('label_prefecture_number')->show();
+
+        $analyzer = $this->analyzePDF($report->generate());
+
+        $this->assertStringContainsString('都道府県番号', $analyzer->getTextsInPage(1));
+        $this->assertContains('IPAMincho', $analyzer->getFontsInPage(1));
+    }
+
     public function test_dynamicTextRenderingWithProperlyFont(): void
     {
         $report = new Thinreports\Report(__DIR__ . '/layouts/dynamic_texts.tlf');
