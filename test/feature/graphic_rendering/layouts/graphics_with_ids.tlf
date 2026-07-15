@@ -1,0 +1,63 @@
+{
+  "version": "0.9.0",
+  "title": "",
+  "report": {
+    "paper-type": "A4",
+    "width": 0.0,
+    "height": 0.0,
+    "orientation": "portrait",
+    "margin": [
+      20.0,
+      20.0,
+      20.0,
+      20.0
+    ]
+  },
+  "items": [
+    {
+      "id": "line_with_id",
+      "type": "line",
+      "display": false,
+      "style": {
+        "border-color": "#000000",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 20.0,
+      "y1": 20.0,
+      "x2": 80.0,
+      "y2": 20.0
+    },
+    {
+      "id": "rect_with_id",
+      "type": "rect",
+      "display": false,
+      "style": {
+        "border-color": "#000000",
+        "border-width": 1,
+        "border-style": "solid",
+        "fill-color": "none"
+      },
+      "x": 20.0,
+      "y": 40.0,
+      "width": 40.0,
+      "height": 20.0,
+      "border-radius": 0
+    },
+    {
+      "id": "ellipse_with_id",
+      "type": "ellipse",
+      "display": false,
+      "style": {
+        "border-color": "#000000",
+        "border-width": 1,
+        "border-style": "solid",
+        "fill-color": "none"
+      },
+      "cx": 100.0,
+      "cy": 50.0,
+      "rx": 20.0,
+      "ry": 10.0
+    }
+  ]
+}
