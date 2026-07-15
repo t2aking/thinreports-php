@@ -195,7 +195,7 @@ class ItemRenderer extends AbstractRenderer
             $bounds['y'],
             $bounds['width'],
             $bounds['height'],
-            $this->buildTextStyles($schema)
+            $this->buildTextStyles($schema['style'])
         );
     }
 
