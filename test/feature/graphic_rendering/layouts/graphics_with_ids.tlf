@@ -35,7 +35,7 @@
       "style": {
         "border-color": "#000000",
         "border-width": 1,
-        "border-style": "solid",
+        "border-style": "dashed",
         "fill-color": "none"
       },
       "x": 20.0,
@@ -51,7 +51,7 @@
       "style": {
         "border-color": "#000000",
         "border-width": 1,
-        "border-style": "solid",
+        "border-style": "dotted",
         "fill-color": "none"
       },
       "cx": 100.0,

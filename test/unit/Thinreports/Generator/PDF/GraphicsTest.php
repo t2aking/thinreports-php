@@ -27,7 +27,7 @@ class GraphicsTest extends TestCase
                         array(
                             'width' => '1',
                             'color' => array(0, 0, 0),
-                            'dash' => null
+                            'dash' => 0
                         )
                     );
 
@@ -85,7 +85,7 @@ class GraphicsTest extends TestCase
                             'all' => array(
                                 'width' => '2',
                                 'color' => array(255, 255, 255),
-                                'dash' => '1,2'
+                                'dash' => '2,2'
                             )
                         ),
                         array(255, 0, 0)
@@ -100,7 +100,7 @@ class GraphicsTest extends TestCase
             array(
                 'stroke_width' => '2',
                 'stroke_color' => 'ffffff',
-                'stroke_dash' => '1,2',
+                'stroke_dash' => 'dashed',
                 'fill_color' => 'red'
             )
         );
@@ -131,7 +131,7 @@ class GraphicsTest extends TestCase
             array(
                 'stroke_width' => '2',
                 'stroke_color' => 'ffffff',
-                'stroke_dash' => '1,2',
+                'stroke_dash' => 'dotted',
                 'fill_color' => 'red',
                 'radius' => 1
             )
@@ -154,7 +154,7 @@ class GraphicsTest extends TestCase
                         array(
                             'width' => '3',
                             'color' => array(0, 0, 255),
-                            'dash' => null
+                            'dash' => 0
                         )
                     );
 
@@ -301,6 +301,36 @@ class GraphicsTest extends TestCase
                     'stroke' => array(
                         'width' => 1.5,
                         'color' => array(0, 0, 0),
+                        'dash' => 0
+                    ),
+                    'fill' => null
+                ),
+                array(
+                    'stroke_width' => 1.5,
+                    'stroke_color' => 'black',
+                    'stroke_dash' => 'solid'
+                )
+            ),
+            array(
+                array(
+                    'stroke' => array(
+                        'width' => 1.5,
+                        'color' => array(0, 0, 0),
+                        'dash' => '2,2'
+                    ),
+                    'fill' => null
+                ),
+                array(
+                    'stroke_width' => 1.5,
+                    'stroke_color' => 'black',
+                    'stroke_dash' => 'dashed'
+                )
+            ),
+            array(
+                array(
+                    'stroke' => array(
+                        'width' => 1.5,
+                        'color' => array(0, 0, 0),
                         'dash' => '1,2'
                     ),
                     'fill' => null
@@ -308,10 +338,22 @@ class GraphicsTest extends TestCase
                 array(
                     'stroke_width' => 1.5,
                     'stroke_color' => 'black',
-                    'stroke_dash' => '1,2'
+                    'stroke_dash' => 'dotted'
                 )
             )
         );
+    }
+
+    public function test_buildGraphicStylesRejectsUnsupportedBorderStyle(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported border style: "invalid"');
+
+        (new Graphics($this->tcpdf))->buildGraphicStyles(array(
+            'stroke_width' => 1,
+            'stroke_color' => 'black',
+            'stroke_dash' => 'invalid'
+        ));
     }
 
     public function test_buildRenderingFlag(): void

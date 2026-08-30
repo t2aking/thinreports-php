@@ -9,6 +9,7 @@
 
 namespace Thinreports\Generator\PDF;
 
+use InvalidArgumentException;
 use TCPDF;
 
 /**
@@ -194,11 +195,7 @@ class Graphics
         } else {
             $stroke_color = ColorParser::parse($attrs['stroke_color']);
 
-            if ($attrs['stroke_dash'] === 'none') {
-                $stroke_dash = 0;
-            } else {
-                $stroke_dash = $attrs['stroke_dash'];
-            }
+            $stroke_dash = $this->normalizeStrokeDash($attrs['stroke_dash']);
 
             $stroke_style = array(
                 'width' => $attrs['stroke_width'],
@@ -214,6 +211,24 @@ class Graphics
         }
 
         return array('stroke' => $stroke_style, 'fill' => $fill_color);
+    }
+
+    /**
+     * Convert Thinreports border styles to TCPDF dash patterns.
+     *
+     * The patterns for dashed and dotted match the official Thinreports
+     * Generator implementation.
+     */
+    private function normalizeStrokeDash(string $stroke_dash): int|string
+    {
+        return match ($stroke_dash) {
+            'none', 'solid' => 0,
+            'dashed' => '2,2',
+            'dotted' => '1,2',
+            default => throw new InvalidArgumentException(
+                sprintf('Unsupported border style: "%s"', $stroke_dash)
+            )
+        };
     }
 
     /**
