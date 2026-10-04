@@ -9,7 +9,7 @@
 
 namespace Thinreports\Generator\PDF;
 
-use TCPDF;
+use Com\Tecnick\Pdf\Tcpdf;
 
 /**
  * @access private
@@ -39,14 +39,14 @@ class Text
     static private int $pdf_default_line_height = 1;
 
     /**
-     * @var TCPDF
+     * @var Tcpdf
      */
-    private TCPDF $pdf;
+    private Tcpdf $pdf;
 
     /**
-     * @param TCPDF $pdf
+     * @param Tcpdf $pdf
      */
-    public function __construct(TCPDF $pdf)
+    public function __construct(Tcpdf $pdf)
     {
         $this->pdf = $pdf;
     }
@@ -69,7 +69,6 @@ class Text
      *      @option string "letter_spacing" optional default is 0
      *      @option string "line_height" optional default is {@see self::$pdf_default_line_height}
      * }
-     * @see http://www.tcpdf.org/doc/code/classTCPDF.html
      */
     public function drawTextBox(string $content, float|string $x, float|string $y, float|string $width, float|string $height, array $attrs = array()): void
     {
@@ -79,40 +78,27 @@ class Text
             return;
         }
 
-        $this->setFontStyles($styles);
-        $this->pdf->setFontSpacing(empty($styles['letter_spacing']) ? 0 : $styles['letter_spacing']);
-        $this->pdf->setCellHeightRatio($styles['line_height']);
-
-        $overflow = $styles['overflow'];
-
-        $font_family = $attrs['font_family'];
-        $font_styles = $attrs['font_style'];
-        $color       = $styles['color'];
-
-        $emulating = $this->startStyleEmulation($font_family, $font_styles, $color);
-
-        $this->pdf->MultiCell(
-            $width,                  // width
-            $height,                 // height
-            $content,                // text
-            0,                       // border
-            $styles['align'],        // align
-            false,                   // fill
-            1,                       // ln
-            $x,                      // x
-            $y,                      // y
-            true,                    // reset height
-            0,                       // stretch mode
-            false,                   // is html
-            true,                    // autopadding
-            $overflow['max_height'], // max-height
-            $styles['valign'],       // valign
-            $overflow['fit_cell']    // fitcell
-        );
-
-        if ($emulating) {
-            $this->resetStyleEmulation();
+        if ($this->pdf->font instanceof FontMetrics) {
+            $this->pdf->font->lineHeight = (float) $styles['line_height'];
         }
+        $this->setFontStyles($styles);
+        $font = $this->pdf->font->getCurrentFont();
+        $emulating = $this->startStyleEmulation($attrs['font_family'], $attrs['font_style'], $styles['color']);
+        $fit = $styles['overflow']['fit_cell'] ? 'F'
+            : ($styles['overflow']['max_height'] > 0 ? 'T' : '');
+        $content = $this->pdf->getTextCell(
+            txt: $content, posx: (float) $x, posy: (float) $y,
+            width: (float) $width, height: (float) $height,
+            linespace: (float) $styles['font_size'] * (float) $styles['line_height'] - $font['height'],
+            valign: $fit === '' ? 'T' : ($styles['valign'] === 'M' ? 'C' : $styles['valign']),
+            halign: $styles['align'],
+            strokewidth: $emulating ? 0.057 : 0,
+            stroke: $emulating,
+            underline: in_array('underline', $attrs['font_style'], true),
+            linethrough: in_array('strikethrough', $attrs['font_style'], true),
+            drawcell: false, fit: $fit
+        );
+        $this->pdf->page->addContent($content);
     }
 
     /**
@@ -131,12 +117,20 @@ class Text
      */
     public function setFontStyles(array $style): void
     {
-        $this->pdf->SetFont(
-            $style['font_family'],
-            $style['font_style'],
-            $style['font_size']
+        $font_style = str_replace(['U', 'D'], '', $style['font_style']);
+        if (in_array(strtolower($style['font_family']), ['ipam', 'ipamp', 'ipag', 'ipagp'], true)) {
+            // IPA has no separate style faces. Bold is stroked per text box.
+            $font_style = '';
+        }
+        $font = $this->pdf->font->insert(
+            $this->pdf->pon, $style['font_family'], $font_style,
+            (float) $style['font_size'], (float) ($style['letter_spacing'] ?? 0),
+            ifile: Font::getDefinitionPath($style['font_family'], $font_style)
         );
-        $this->pdf->SetTextColorArray($style['color']);
+        $color = sprintf('#%02x%02x%02x', ...$style['color']);
+        $this->pdf->page->addContent($font['out'] . "\n"
+            . $this->pdf->color->getPdfFillColor($color)
+            . $this->pdf->color->getPdfStrokeColor($color));
     }
 
     /**
@@ -253,13 +247,11 @@ class Text
             return false;
         }
 
-        $this->pdf->setDrawColorArray($color);
-        $this->pdf->setTextRenderingMode($this->pdf->GetLineWidth() * 0.1);
         return true;
     }
 
     public function resetStyleEmulation(): void
     {
-        $this->pdf->setTextRenderingMode(0);
+        // Rendering mode is scoped to each getTextCell() call.
     }
 }

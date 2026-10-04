@@ -30,7 +30,7 @@ class GraphicRenderingFeature extends FeatureTest
         $analyzer = $this->analyzePDF($report->generate());
 
         $this->assertMatchesRegularExpression(
-            '/2\.000000 w .* RG\s+20\.000000 821\.890000 m/s',
+            '/2\.000000 w\s+.* RG\s+.*?20\.000000 821\.890000 m/s',
             $analyzer->getRawContentInPage(1)
         );
     }
@@ -58,7 +58,7 @@ class GraphicRenderingFeature extends FeatureTest
                 $content
             );
             $this->assertMatchesRegularExpression(
-                '/20\.000000 801\.890000 40\.000000 -20\.000000 re S/',
+                '/20\.000000 801\.890000 40\.000000 -20\.000000 re\s+S/',
                 $content
             );
             $this->assertMatchesRegularExpression(
@@ -81,7 +81,7 @@ class GraphicRenderingFeature extends FeatureTest
             ),
             'rect' => array(
                 'rect_with_id',
-                '/20\.000000 801\.890000 40\.000000 -20\.000000 re S/'
+                '/20\.000000 801\.890000 40\.000000 -20\.000000 re\s+S/'
             ),
             'ellipse' => array(
                 'ellipse_with_id',

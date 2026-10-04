@@ -10,7 +10,7 @@
 namespace Thinreports\Generator\PDF;
 
 use InvalidArgumentException;
-use TCPDF;
+use Com\Tecnick\Pdf\Tcpdf;
 
 /**
  * @access private
@@ -30,9 +30,9 @@ class Graphics
     );
 
     /**
-     * @var TCPDF
+     * @var Tcpdf
      */
-    private TCPDF $pdf;
+    private Tcpdf $pdf;
 
     /**
      * @var string[]
@@ -40,9 +40,9 @@ class Graphics
     private array $image_registry = array();
 
     /**
-     * @param TCPDF $pdf
+     * @param Tcpdf $pdf
      */
-    public function __construct(TCPDF $pdf)
+    public function __construct(Tcpdf $pdf)
     {
         $this->pdf = $pdf;
     }
@@ -57,7 +57,6 @@ class Graphics
      *      @option string|null "stroke_color" required
      *      @option string "stroke_dash" required
      * }
-     * @see http://www.tcpdf.org/doc/code/classTCPDF.html
      */
     public function drawLine(float|string $x1, float|string $y1, float|string $x2, float|string $y2, array $attrs = array()): void
     {
@@ -67,7 +66,8 @@ class Graphics
             return;
         }
 
-        $this->pdf->Line($x1, $y1, $x2, $y2, $style['stroke']);
+        $this->pdf->page->addContent($this->pdf->graph->getLine(
+            (float) $x1, (float) $y1, (float) $x2, (float) $y2, $this->toEngineStyle($style)));
     }
 
     /**
@@ -82,20 +82,25 @@ class Graphics
      *      @option string "fill" required
      *      @option float|string "radius" required
      * }
-     * @see http://www.tcpdf.org/doc/code/classTCPDF.html
      */
     public function drawRect(float|string $x, float|string $y, float|string $width, float|string $height, array $attrs = array()): void
     {
         $style = $this->buildGraphicStyles($attrs);
         $rendering_flag = $this->buildRenderingFlag($style['stroke'], $style['fill']);
 
-        if (empty($attrs['radius'])) {
-            $this->pdf->Rect($x, $y, $width, $height,
-                $rendering_flag, array('all' => $style['stroke']), $style['fill']);
-        } else {
-            $this->pdf->RoundedRect($x, $y, $width, $height, $attrs['radius'], '1111',
-                $rendering_flag, $style['stroke'], $style['fill']);
+        if ($rendering_flag === '') {
+            return;
         }
+        $mode = $this->toPaintMode($rendering_flag);
+        $engine_style = $this->toEngineStyle($style);
+        if (empty($attrs['radius'])) {
+            $out = $this->pdf->graph->getBasicRect((float) $x, (float) $y, (float) $width, (float) $height,
+                $mode, $engine_style);
+        } else {
+            $out = $this->pdf->graph->getRoundedRect((float) $x, (float) $y, (float) $width, (float) $height,
+                (float) $attrs['radius'], (float) $attrs['radius'], '1111', $mode, $engine_style);
+        }
+        $this->pdf->page->addContent($out);
     }
 
     /**
@@ -109,15 +114,18 @@ class Graphics
      *      @option string "stroke_dash" required
      *      @option string "fill" required
      * }
-     * @see http://www.tcpdf.org/doc/code/classTCPDF.html
      */
     public function drawEllipse(float|string $cx, float|string $cy, float|string $rx, float|string $ry, array $attrs = array()): void
     {
         $style = $this->buildGraphicStyles($attrs);
         $rendering_flag = $this->buildRenderingFlag($style['stroke'], $style['fill']);
 
-        $this->pdf->Ellipse($cx, $cy, $rx, $ry,
-            0, 0, 360, $rendering_flag, $style['stroke'], $style['fill']);
+        if ($rendering_flag === '') {
+            return;
+        }
+        $this->pdf->page->addContent($this->pdf->graph->getEllipse(
+            (float) $cx, (float) $cy, (float) $rx, (float) $ry, 0, 0, 360,
+            $this->toPaintMode($rendering_flag), $this->toEngineStyle($style)));
     }
 
     /**
@@ -130,29 +138,49 @@ class Graphics
      *      @option string "align" optional default is "left"
      *      @option string "valign" optional default is "top"
      * }
-     * @see http://www.tcpdf.org/doc/code/classTCPDF.html
      */
     public function drawImage(string $filename, float|string $x, float|string $y, float|string $width, float|string $height, array $attrs = array()): void
     {
+        // These paths are supplied through Thinreports' image API, never HTML markup.
+        $data = file_get_contents($filename);
+        if ($data === false) {
+            throw new \RuntimeException('Unable to read image: ' . $filename);
+        }
+        $size = getimagesizefromstring($data);
+        if ($size === false) {
+            throw new InvalidArgumentException('Invalid image: ' . $filename);
+        }
+        if ($size[2] === IMAGETYPE_XBM) {
+            // GD's generic byte decoder cannot read XBM; use its dedicated decoder.
+            $bitmap = imagecreatefromxbm($filename);
+            if ($bitmap === false) {
+                throw new InvalidArgumentException('Invalid XBM image: ' . $filename);
+            }
+            ob_start();
+            try {
+                if (!imagepng($bitmap)) {
+                    throw new \RuntimeException('Unable to convert XBM image: ' . $filename);
+                }
+                $data = (string) ob_get_contents();
+            } finally {
+                ob_end_clean();
+            }
+        }
+        // Preserve fractional point coordinates; the engine's fit helper accepts integer pixels.
+        $scale = min((float) $width / $size[0], (float) $height / $size[1]);
+        $dim = ['width' => $size[0] * $scale, 'height' => $size[1] * $scale];
+        // As before, downsample oversized images to 300 dpi, without upsampling.
+        $pixel_width = max(1, (int) round($dim['width'] * 300 / 72));
+        $pixel_height = max(1, (int) round($dim['height'] * 300 / 72));
+        $resize = $pixel_width * $pixel_height < $size[0] * $size[1];
+        $iid = $this->pdf->image->add('@' . $data,
+            $resize ? $pixel_width : null, $resize ? $pixel_height : null);
         $position = $this->buildImagePosition($attrs);
-
-        $this->pdf->Image(
-            $filename,  // image file
-            $x,         // x
-            $y,         // y
-            $width,     // box width
-            $height,    // box height
-            null,       // type
-            null,       // link
-            null,       // align
-            true,       // resize
-            300,        // dpi
-            null,       // palign
-            false,      // ismask
-            false,      // imgmask
-            0,          // border
-            $position   // fitbox
-        );
+        $x += ($width - $dim['width']) * match ($position[0]) { 'C' => 0.5, 'R' => 1, default => 0 };
+        $y += ($height - $dim['height']) * match ($position[1]) { 'M' => 0.5, 'B' => 1, default => 0 };
+        $page = $this->pdf->page->getPage();
+        $this->pdf->page->addContent($this->pdf->image->getSetImage(
+            $iid, (float) $x, (float) $y, $dim['width'], $dim['height'], $page['height']));
     }
 
     /**
@@ -182,6 +210,7 @@ class Graphics
         foreach ($this->image_registry as $image_path) {
             unlink($image_path);
         }
+        $this->image_registry = [];
     }
 
     /**
@@ -213,8 +242,25 @@ class Graphics
         return array('stroke' => $stroke_style, 'fill' => $fill_color);
     }
 
+    private function toPaintMode(string $flag): string
+    {
+        return match ($flag) { 'DF' => 'B', 'F' => 'f', default => 'S' };
+    }
+
+    private function toEngineStyle(array $style): array
+    {
+        $stroke = $style['stroke'];
+        return [
+            'lineWidth' => (float) ($stroke['width'] ?? 0),
+            'lineColor' => $stroke === null ? 'black' : sprintf('#%02x%02x%02x', ...($stroke['color'] ?? [0, 0, 0])),
+            'fillColor' => $style['fill'] === null ? 'black' : sprintf('#%02x%02x%02x', ...$style['fill']),
+            'dashArray' => empty($stroke['dash']) ? [] : array_map('floatval', explode(',', $stroke['dash'])),
+            'lineCap' => 'butt', 'lineJoin' => 'miter', 'dashPhase' => 0,
+        ];
+    }
+
     /**
-     * Convert Thinreports border styles to TCPDF dash patterns.
+     * Normalize Thinreports border styles before conversion to engine dash arrays.
      *
      * The patterns for dashed and dotted match the official Thinreports
      * Generator implementation.

@@ -1,5 +1,12 @@
 ## master
 
+ * Migrate the PDF backend directly from TCPDF 6 to tc-lib-pdf 8.
+ * Bundle converted standard and IPA fonts; no runtime font conversion is needed.
+ * Preserve font-size-based line heights, Japanese wrapping, and truncation without
+   ellipses. Fitted text and decoration metrics may differ slightly between engines.
+ * Preserve fractional image placement and 300 dpi image downsampling.
+ * Custom font definitions now use tc-lib-pdf JSON files instead of TCPDF PHP files.
+
  * [Support v0.9 format schema](https://github.com/thinreports-php/thinreports-php/projects/1)
 
 ## 0.8.1

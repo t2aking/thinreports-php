@@ -39,8 +39,9 @@ Please see the following pages for further details.
 
 ## Supported PHP versions
 
-  * PHP 5.3, 5.4, 5.5, 5.6, 7
-  * See [build result on TravisCI](https://travis-ci.org/thinreports-php/thinreports-php)
+  * PHP 8.4 or later (within PHP 8.x).
+  * Composer checks the PHP extensions required by tc-lib-pdf, including
+    `gd`, `mbstring`, `openssl`, `xml`, and `zlib`.
 
 ## Compatibility with Thinreports
 
@@ -112,6 +113,50 @@ $pdf_data = $report->generate();
 If you want to render multi-byte characters such as "日本語",
 you need to configure the IPAFont to font-family property of the Text-block in the Editor.
 
+## PDF backend migration
+
+PDFs are generated directly with `tecnickcom/tc-lib-pdf` (8.73.6 or later).
+The legacy `tecnickcom/tcpdf` package is no longer required. Report, page, item,
+and `.tlf` APIs remain unchanged.
+
+The standard 14 fonts and four IPA fonts are ready to use after `composer install`.
+No font-generation hook or writable font directory is required. See
+[font asset documentation](fonts/README.md) for provenance and maintainer rebuilds.
+Existing calls to `Thinreports\Generator\PDF\Font::build()` remain supported.
+Custom fonts must use tc-lib-pdf JSON definitions rather than TCPDF PHP font files;
+applications may configure their custom font directory with `K_PATH_FONTS` before
+creating a report.
+
+Text uses the existing font-size-based line height, wraps long Japanese strings,
+and truncates without an ellipsis. The new engine's fitting algorithm and text
+metrics can still produce small differences in fitted text and decorations.
+Compare representative reports before upgrading production. PDF bytes and internal
+object numbering are not compatible baselines; compare content and rendered pages.
+Images retain 300 dpi downsampling for oversized sources and fit the layout box
+without rounding fractional point coordinates. Local image paths continue to work,
+including paths outside the package directory.
+
+### Checking rendering changes
+
+Generate a repeatable fixture with text, fonts, shapes, and images:
+
+```sh
+php tools/render-regression.php /tmp/after.pdf
+```
+
+To compare it with a saved baseline, install Poppler (`pdftoppm`) and Python's
+Pillow package, then run:
+
+```sh
+python3 tools/compare-rendered-pdfs.py /tmp/before.pdf /tmp/after.pdf --output /tmp/pdf-diff
+```
+
+The comparison checks every page, rejects page-count or size changes, and writes
+red-highlighted differences plus a JSON summary. It exits nonzero for changed
+pixels by default. Use `--max-changed-fraction` only for a reviewed tolerance;
+use the same Poppler version and system fonts for both documents. Semantic and
+coordinate regression tests run in the ordinary `composer test` suite.
+
 ## Development Community
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/thinreports-php/thinreports-php/dev)
@@ -141,9 +186,13 @@ See [LICENSE](https://github.com/thinreports-php/thinreports-php/blob/master/LIC
 
 ### Dependency Library & Resource
 
-#### TCPDF
+#### tc-lib-pdf
 
 LGPLv3 / Copyright (c) Nicola Asuni [Tecnick.com](http://www.tecnick.com) LTD
+
+#### Adobe Core 14 font metrics
+
+See [the redistribution notice](fonts/core/LICENSE).
 
 #### IPA Font
 
