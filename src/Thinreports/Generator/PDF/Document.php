@@ -9,15 +9,15 @@
 
 namespace Thinreports\Generator\PDF;
 
-use TCPDF;
+use Com\Tecnick\Pdf\Tcpdf;
 use Thinreports\Layout;
 
 class Document
 {
     /**
-     * @var TCPDF
+     * @var Tcpdf
      */
-    private TCPDF $pdf;
+    private Tcpdf $pdf;
 
     /**
      * @var Graphics
@@ -46,18 +46,19 @@ class Document
      */
     public function __construct(?Layout $default_layout = null)
     {
-        $this->pdf = new TCPDF('P', 'pt', 'A4', true, 'UTF-8');
-
-        $this->pdf->SetCreator('Thinreports Generator');
-        $this->pdf->SetAutoPageBreak(false);
-        $this->pdf->SetMargins(0, 0, 0, true);
-        $this->pdf->SetCellPadding(0);
-        $this->pdf->SetCellMargins(0, 0, 0, 0);
-        $this->pdf->SetPrintHeader(false);
-        $this->pdf->SetPrintFooter(false);
+        $font_paths = [Font::getGeneratedPath()];
+        if (defined('K_PATH_FONTS') && is_string(K_PATH_FONTS) && K_PATH_FONTS !== '') {
+            $font_paths[] = K_PATH_FONTS;
+        }
+        $this->pdf = new Engine(unit: 'pt', subsetfont: true,
+            fileOptions: ['allowedPaths' => $font_paths]);
+        $this->pdf->font = new FontMetrics(kunit: 1, subset: true, fileHelper: $this->pdf->file);
+        $this->pdf->setCreator('Thinreports Generator');
+        $this->pdf->setDefaultCellPadding(0, 0, 0, 0);
+        $this->pdf->setDefaultCellMargin(0, 0, 0, 0);
 
         if ($default_layout !== null) {
-            $this->pdf->SetTitle($default_layout->getReportTitle());
+            $this->pdf->setTitle($default_layout->getReportTitle());
             $this->registerPageFormat($default_layout);
         }
 
@@ -70,7 +71,7 @@ class Document
     public function addPage(Layout $layout): void
     {
         $page_format = $this->registerPageFormat($layout);
-        $this->pdf->AddPage($page_format['orientation'], $page_format['size']);
+        $this->appendPage($page_format);
 
         $this->last_page_layout = $layout;
     }
@@ -82,7 +83,7 @@ class Document
         } else {
             $page_format = array('orientation' => 'P', 'size' => 'A4');
         }
-        $this->pdf->AddPage($page_format['orientation'], $page_format['size']);
+        $this->appendPage($page_format);
     }
 
     /**
@@ -90,7 +91,10 @@ class Document
      */
     public function render(): string
     {
-        return $this->pdf->getPDFData();
+        if ($this->pdf->page->getPages() === []) {
+            $this->addBlankPage();
+        }
+        return $this->pdf->getOutPDFString();
     }
 
     /**
@@ -107,8 +111,8 @@ class Document
             $size = match ($layout->getPagePaperType()) {
                 'B4_ISO' => 'B4',
                 'B5_ISO' => 'B5',
-                'B4' => 'B4_JIS',
-                'B5' => 'B5_JIS',
+                'B4' => 'JIS_B4',
+                'B5' => 'JIS_B5',
                 default => $layout->getPagePaperType(),
             };
         }
@@ -140,6 +144,19 @@ class Document
     public function getRegisteredPageFormat(string $layout_identifier): array
     {
         return $this->page_formats[$layout_identifier];
+    }
+
+    private function appendPage(array $format): void
+    {
+        $data = ['orientation' => $format['orientation'], 'autobreak' => false,
+            'margin' => ['PL' => 0, 'PR' => 0, 'PT' => 0, 'PB' => 0]];
+        if (is_array($format['size'])) {
+            $data['width'] = (float) $format['size'][0];
+            $data['height'] = (float) $format['size'][1];
+        } else {
+            $data['format'] = $format['size'];
+        }
+        $this->pdf->addPage($data);
     }
 
     public function initDrawer(): void

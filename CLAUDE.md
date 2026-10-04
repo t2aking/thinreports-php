@@ -48,12 +48,12 @@ Each item has an associated style class in `src/Thinreports/Item/Style/`.
 2. `PDFGenerator` iterates pages and delegates to:
    - `LayoutRenderer` - Renders static layout elements (text, images, shapes)
    - `ItemRenderer` - Renders dynamic items with user-set values
-3. Both renderers use `PDF\Document` which wraps TCPDF
+3. Both renderers use `PDF\Document` which wraps tc-lib-pdf
 
 ### PDF Helpers
 
 Located in `src/Thinreports/Generator/PDF/`:
-- `Document` - TCPDF wrapper, page management
+- `Document` - tc-lib-pdf wrapper, page management
 - `Graphics` - Shape drawing (rect, ellipse, line, images)
 - `Text` - Text box rendering with alignment/formatting
 - `Font` - Font family mapping

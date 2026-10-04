@@ -81,11 +81,7 @@ class PDFAnalyzer
 
     public function isEmptyPage($page_number): bool
     {
-        $texts = str_replace(
-            "Powered by TCPDF (www.tcpdf.org) ", '',
-            $this->getTextsInPage($page_number)
-        );
-        return $texts === ' ' || $texts === '';
+        return trim($this->getTextsInPage($page_number)) === '';
     }
 
     public function getImageContentsInPage($page_number): array

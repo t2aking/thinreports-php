@@ -40,6 +40,25 @@ class Font
         }
     }
 
+    public static function getGeneratedPath(): string
+    {
+        return dirname(__DIR__, 4) . '/fonts/generated';
+    }
+
+    public static function getDefinitionPath(string $family, string $style = ''): string
+    {
+        $name = strtolower(self::getFontName($family));
+        $suffix = (str_contains($style, 'B') ? 'b' : '') . (str_contains($style, 'I') ? 'i' : '');
+        foreach ([$name . $suffix, $name] as $key) {
+            $path = self::getGeneratedPath() . '/' . $key . '.json';
+            if (is_file($path)) {
+                return $path;
+            }
+        }
+        // Allow application-provided tc-lib font families (e.g. K_PATH_FONTS).
+        return '';
+    }
+
     /**
      * @param string $name
      * @return string
@@ -63,13 +82,15 @@ class Font
     /**
      * @param string $name
      * @return string
-     * @see http://www.tcpdf.org/doc/code/classTCPDF__FONTS.html
      */
     public static function installBuiltinFont(string $name): string
     {
         $filename = self::getBuiltinFontPath($name);
 
-        $font_name = \TCPDF_FONTS::addTTFFont($filename, 'TrueTypeUnicode', '', 32);
+        $font_name = pathinfo($filename, PATHINFO_FILENAME);
+        if (!is_file(self::getGeneratedPath() . '/' . $font_name . '.json')) {
+            throw new \RuntimeException('Missing bundled font: ' . $font_name);
+        }
         static::$installed_builtin_fonts[$name] = $font_name;
 
         return $font_name;

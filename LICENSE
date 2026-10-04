@@ -23,12 +23,18 @@ Thinreports PHP
   OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-TCPDF
+tc-lib-pdf and tc-lib-pdf-font
 
   Copyright (c) Nicola Asuni Tecnick.com LTD.
-  See http://www.tcpdf.org/license.php for license details.
+  Licensed under LGPL-3.0-or-later.
+  See fonts/generated/LICENSE.tc-lib-pdf-font and the dependency license files.
 
 IPA Font
 
   Copyright Information-technology Promotion Agency, Japan.
   See http://ipafont.ipa.go.jp/ipa_font_license_v1.html for license details.
+
+Adobe Core 14 font metrics
+
+  Copyright Adobe Systems Incorporated.
+  See fonts/core/LICENSE and the copyright notices in fonts/core/*.afm.

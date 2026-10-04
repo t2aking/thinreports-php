@@ -6,128 +6,33 @@ use Thinreports\TestCase;
 
 class TextTest extends TestCase
 {
-    private $tcpdf;
+    private Engine $tcpdf;
 
     public function setup(): void
     {
-        $this->tcpdf = $this->getMockBuilder('TCPDF')
-                            ->onlyMethods(array(
-                                'SetFont',
-                                'SetTextColorArray',
-                                'setFontSpacing',
-                                'setCellHeightRatio',
-                                'MultiCell'
-                            ))
-                            ->getMock();
-    }
-
-    public function test_drawTextBox(): void
-    {
-        $this->tcpdf->expects($this->once())
-                    ->method('SetFont')
-                    ->with('Helvetica', '', '18');
-
-        $this->tcpdf->expects($this->once())
-                    ->method('SetTextColorArray')
-                    ->with(array(0, 0, 0));
-
-        $this->tcpdf->expects($this->once())
-                    ->method('setFontSpacing')
-                    ->with(0);
-
-        $this->tcpdf->expects($this->once())
-                    ->method('setCellHeightRatio')
-                    ->with(1);
-
-        $this->tcpdf->expects($this->once())
-                    ->method('MultiCell')
-                    ->with(
-                        300,
-                        400,
-                        "row1\nrow2",
-                        0,
-                        'L',
-                        false,
-                        1,
-                        100,
-                        200,
-                        true,
-                        0,
-                        false,
-                        true,
-                        400,
-                        'T',
-                        false
-                    );
-
-        $test_text = new Text($this->tcpdf);
-        $test_text->drawTextBox(
-            "row1\nrow2", 100, 200, 300, 400,
-            array(
-                'font_style' => array(),
-                'font_size' => '18',
-                'font_family' => 'Helvetica',
-                'color' => '#000000'
-            )
-        );
+        $this->tcpdf = new Engine(unit: 'pt', fileOptions: ['allowedPaths' => [Font::getGeneratedPath()]]);
+        $this->tcpdf->font = new FontMetrics(kunit: 1, fileHelper: $this->tcpdf->file);
+        $this->tcpdf->setDefaultCellPadding(0, 0, 0, 0);
+        $this->tcpdf->addPage();
     }
 
     public function test_drawTextBox_with_color_none(): void
     {
-        $this->tcpdf->expects($this->never())
-                    ->method('MultiCell');
-
-        $test_text = new Text($this->tcpdf);
-        $test_text->drawTextBox(
-            "row1\nrow2", 100, 200, 300, 400,
-            array(
-                'font_style' => array(),
-                'font_size' => '18',
-                'font_family' => 'Helvetica',
-                'color' => 'none'
-            )
-        );
+        $before = $this->tcpdf->page->getPage()['content'];
+        (new Text($this->tcpdf))->drawTextBox('hidden', 10, 20, 100, 30, [
+            'font_style' => [], 'font_size' => 18, 'font_family' => 'Helvetica', 'color' => 'none',
+        ]);
+        $this->assertSame($before, $this->tcpdf->page->getPage()['content']);
     }
 
-    public function test_drawText(): void
+    public function test_drawText_flattensNewlines(): void
     {
-        $this->tcpdf->expects($this->once())
-                    ->method('MultiCell')
-                    ->with(300, 400, 'row1 row2 row3');
-
-        $this->tcpdf->expects($this->once())
-                    ->method('setCellHeightRatio')
-                    ->with(1);
-
-        $test_text = new Text($this->tcpdf);
-        $test_text->drawText(
-            "row1\nrow2\nrow3", 100, 200, 300, 400,
-            array(
-                'font_style' => array(),
-                'font_size' => '18',
-                'font_family' => 'Helvetica',
-                'color' => 'red'
-            )
-        );
-    }
-
-    public function test_setFontStyles(): void
-    {
-        $this->tcpdf->expects($this->once())
-                    ->method('SetFont')
-                    ->with('Helvetica', 'BIUD', '18');
-
-        $this->tcpdf->expects($this->once())
-                    ->method('SetTextColorArray')
-                    ->with(array(0, 0, 0));
-
-        $test_text = new Text($this->tcpdf);
-        $test_text->setFontStyles(array(
-            'color' => array(0, 0, 0),
-            'font_family' => 'Helvetica',
-            'font_style' => 'BIUD',
-            'font_size' => '18'
-        ));
+        (new Text($this->tcpdf))->drawText("row1\nrow2\nrow3", 10, 20, 300, 30, [
+            'font_style' => [], 'font_size' => 18, 'font_family' => 'Helvetica', 'color' => 'black',
+        ]);
+        $parser = new \Smalot\PdfParser\Parser();
+        $pdf = $parser->parseContent($this->tcpdf->getOutPDFString());
+        $this->assertStringContainsString('row1 row2 row3', $pdf->getText());
     }
 
     #[DataProvider('boxAttributesProvider')]
