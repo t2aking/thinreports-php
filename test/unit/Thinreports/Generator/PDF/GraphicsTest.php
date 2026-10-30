@@ -165,4 +165,115 @@ class GraphicsTest extends TestCase
             'align' => 'center', 'valign' => 'middle'
         )));
     }
+
+    public static function opaquePngProvider(): array
+    {
+        return [
+            'RGB' => [false],
+            'palette without tRNS' => [true],
+        ];
+    }
+
+    #[DataProvider('opaquePngProvider')]
+    public function test_drawImage_downsamplesOpaquePngWithoutMask(bool $palette): void
+    {
+        $png = $this->createPng(400, 300, $palette);
+        // 50pt x 40pt at 300 dpi is 208 x 156 pixels, below the 400 x 300 source.
+        $this->drawImageData($this->tcpdf, $png, 50, 40);
+
+        $data = $this->imageData($this->tcpdf, 1);
+        $this->assertFalse($data['splitalpha']);
+        $this->assertArrayNotHasKey('mask', $data);
+        $this->assertSame([208, 156], [$data['width'], $data['height']]);
+        $this->assertStringNotContainsString('/SMask', $this->tcpdf->getOutPDFString());
+
+        // The pixels are the ones tc-lib embeds when it resizes the image itself.
+        $reference = new Engine(unit: 'pt');
+        $reference->addPage();
+        $iid = $reference->image->add('@' . $png, 208, 156);
+        $expected = $this->imageData($reference, $iid);
+        $this->assertTrue($expected['splitalpha']);
+        $this->assertSamePixels($expected['plain']['raw'], $data['raw']);
+    }
+
+    public function test_drawImage_reusesDownsampledImage(): void
+    {
+        $png = $this->createPng(400, 300, false);
+        $this->drawImageData($this->tcpdf, $png, 50, 40);
+        $this->drawImageData($this->tcpdf, $png, 50, 40);
+
+        $this->assertSame($this->imageData($this->tcpdf, 1)['key'], $this->imageData($this->tcpdf, 2)['key']);
+    }
+
+    public function test_drawImage_keepsAlphaOfTransparentPng(): void
+    {
+        $image = imagecreatetruecolor(400, 300);
+        imagealphablending($image, false);
+        imagesavealpha($image, true);
+        imagefill($image, 0, 0, imagecolorallocatealpha($image, 10, 20, 30, 64));
+        ob_start();
+        imagepng($image);
+        $this->drawImageData($this->tcpdf, (string) ob_get_clean(), 50, 40);
+
+        $this->assertArrayHasKey('mask', $this->imageData($this->tcpdf, 1));
+        $this->assertStringContainsString('/SMask', $this->tcpdf->getOutPDFString());
+    }
+
+    public function test_drawImage_embedsSmallPngAsIs(): void
+    {
+        $png = $this->createPng(40, 30, false);
+        $this->drawImageData($this->tcpdf, $png, 50, 40);
+
+        $this->assertSame($png, $this->imageData($this->tcpdf, 1)['raw']);
+    }
+
+    private function createPng(int $width, int $height, bool $palette): string
+    {
+        $image = imagecreatetruecolor($width, $height);
+        for ($y = 0; $y < $height; $y++) {
+            for ($x = 0; $x < $width; $x++) {
+                $color = (($x * 7 + $y * 3) % 256) << 16 | (($x * $y) % 256) << 8 | (($x ^ $y) % 256);
+                imagesetpixel($image, $x, $y, $color);
+            }
+        }
+        if ($palette) {
+            imagetruecolortopalette($image, false, 255);
+        }
+        ob_start();
+        imagepng($image);
+        return (string) ob_get_clean();
+    }
+
+    private function drawImageData(Engine $pdf, string $png, float $width, float $height): void
+    {
+        $path = (string) tempnam(sys_get_temp_dir(), 'thinreports-test');
+        try {
+            file_put_contents($path, $png);
+            (new Graphics($pdf))->drawImage($path, 0, 0, $width, $height);
+        } finally {
+            unlink($path);
+        }
+    }
+
+    private function imageData(Engine $pdf, int $iid): array
+    {
+        $images = (new \ReflectionProperty($pdf->image, 'image'))->getValue($pdf->image);
+        return $pdf->image->getImageDataByKey($images[$iid]['key']);
+    }
+
+    private function assertSamePixels(string $expected_png, string $actual_png): void
+    {
+        $expected = imagecreatefromstring($expected_png);
+        $actual = imagecreatefromstring($actual_png);
+        $this->assertSame([imagesx($expected), imagesy($expected)], [imagesx($actual), imagesy($actual)]);
+        $differences = 0;
+        for ($y = 0; $y < imagesy($expected); $y++) {
+            for ($x = 0; $x < imagesx($expected); $x++) {
+                $rgb = fn ($image) => imagecolorsforindex($image, imagecolorat($image, $x, $y));
+                [$a, $b] = [$rgb($expected), $rgb($actual)];
+                $differences += (int) ([$a['red'], $a['green'], $a['blue']] !== [$b['red'], $b['green'], $b['blue']]);
+            }
+        }
+        $this->assertSame(0, $differences);
+    }
 }

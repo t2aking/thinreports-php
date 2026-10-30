@@ -40,6 +40,11 @@ class Graphics
     private array $image_registry = array();
 
     /**
+     * @var string[] Downsampled PNG data by source image and pixel size.
+     */
+    private array $downsampled_images = array();
+
+    /**
      * @param Tcpdf $pdf
      */
     public function __construct(Tcpdf $pdf)
@@ -173,6 +178,13 @@ class Graphics
         $pixel_width = max(1, (int) round($dim['width'] * 300 / 72));
         $pixel_height = max(1, (int) round($dim['height'] * 300 / 72));
         $resize = $pixel_width * $pixel_height < $size[0] * $size[1];
+        if ($resize && $this->isOpaquePng($data, $size)) {
+            $downsampled = $this->downsampleOpaqueImage($data, $pixel_width, $pixel_height);
+            if ($downsampled !== null) {
+                $data = $downsampled;
+                $resize = false;
+            }
+        }
         $iid = $this->pdf->image->add('@' . $data,
             $resize ? $pixel_width : null, $resize ? $pixel_height : null);
         $position = $this->buildImagePosition($attrs);
@@ -181,6 +193,83 @@ class Graphics
         $page = $this->pdf->page->getPage();
         $this->pdf->page->addContent($this->pdf->image->getSetImage(
             $iid, (float) $x, (float) $y, $dim['width'], $dim['height'], $page['height']));
+    }
+
+    /**
+     * Whether the PNG has no alpha channel and no transparent color (tRNS).
+     *
+     * @param string $data PNG data
+     * @param array $size Result of getimagesizefromstring()
+     * @return bool
+     */
+    private function isOpaquePng(string $data, array $size): bool
+    {
+        // tc-lib refuses to resize images above this many pixels; leave them to its error.
+        if ($size[2] !== IMAGETYPE_PNG || $size[0] * $size[1] > 64_000_000
+            || strlen($data) < 33 || !str_starts_with($data, "\x89PNG\r\n\x1a\n")) {
+            return false;
+        }
+        // IHDR color type: 0 gray, 2 RGB, 3 palette. 4 and 6 carry an alpha channel.
+        if (!in_array(ord($data[25]), [0, 2, 3], true)) {
+            return false;
+        }
+        // tRNS must come before the first IDAT chunk.
+        for ($pos = 8; $pos + 8 <= strlen($data);) {
+            $length = unpack('N', $data, $pos)[1];
+            $type = substr($data, $pos + 4, 4);
+            if ($type === 'tRNS') {
+                return false;
+            }
+            if ($type === 'IDAT') {
+                return true;
+            }
+            $pos += 12 + $length;
+        }
+        return false;
+    }
+
+    /**
+     * Downsample an opaque image to a PNG without an alpha channel.
+     *
+     * tc-lib resizes with an alpha channel, then splits it into an image and an
+     * opaque soft mask, encoding each at the highest compression level. That took
+     * seconds for a 300 dpi A4 background. The resize below is the same GD call,
+     * so the embedded pixels are unchanged; only the unused mask is left out.
+     *
+     * @param string $data
+     * @param int $width
+     * @param int $height
+     * @return string|null PNG data, or null to let tc-lib handle the image
+     */
+    private function downsampleOpaqueImage(string $data, int $width, int $height): ?string
+    {
+        if (!function_exists('imagecreatefromstring')) {
+            return null;
+        }
+        $key = hash('xxh128', $data) . ':' . $width . 'x' . $height;
+        if (array_key_exists($key, $this->downsampled_images)) {
+            return $this->downsampled_images[$key];
+        }
+        $source = @imagecreatefromstring($data);
+        if ($source === false) {
+            return null;
+        }
+        $image = imagecreatetruecolor($width, $height);
+        imageinterlace($image, false);
+        imagealphablending($image, false);
+        imagesavealpha($image, false);
+        imagecopyresampled($image, $source, 0, 0, 0, 0, $width, $height, imagesx($source), imagesy($source));
+        ob_start();
+        try {
+            // zlib's default level; level 9 was four times slower for a 1-2% smaller file.
+            if (!imagepng($image, null, 6)) {
+                return null;
+            }
+            $png = (string) ob_get_contents();
+        } finally {
+            ob_end_clean();
+        }
+        return $this->downsampled_images[$key] = $png;
     }
 
     /**
