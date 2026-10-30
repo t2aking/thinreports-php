@@ -1,5 +1,10 @@
 ## master
 
+ * Speed up reports with large opaque background images and reduce memory use with
+   Japanese fonts. A downsampled opaque PNG is resized once with GD and embedded
+   without the fully opaque soft mask tc-lib-pdf added; its pixels are unchanged.
+   Scaled glyph bounding boxes are no longer cached for every font size.
+
  * Keep wrapping Japanese text at spaces with tc-lib-pdf 8.78.3 and later, which
    otherwise also breaks between ideographs. Require tc-lib-pdf 8.78.3 or later.
 
