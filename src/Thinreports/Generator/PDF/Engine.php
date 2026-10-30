@@ -7,6 +7,15 @@ use Com\Tecnick\Pdf\Tcpdf;
 /** Internal adaptations for Thinreports text semantics. */
 class Engine extends Tcpdf
 {
+    /** Accepts the same arguments as Tcpdf::__construct(). */
+    public function __construct(mixed ...$args)
+    {
+        parent::__construct(...$args);
+        // Break only at spaces, as TCPDF 6 did. Unspaced text that is too long is still
+        // split in splitLines(), so Japanese without spaces keeps wrapping.
+        $this->enableIdeographicBreaks(false);
+    }
+
     /** Thinreports truncates without adding an ellipsis. */
     protected function getTextCellTruncationMarkerOrdArr(): array
     {
@@ -14,9 +23,9 @@ class Engine extends Tcpdf
     }
 
     /** Split unspaced text (including Japanese) that exceeds the cell width. */
-    protected function splitLines(array $ordarr, array $dim, float $pwidth, float $poffset = 0, bool $rtl = false): array
+    protected function splitLines(array $ordarr, array $dim, float $pwidth, float $poffset = 0): array
     {
-        $lines = parent::splitLines($ordarr, $dim, $pwidth, $poffset, $rtl);
+        $lines = parent::splitLines($ordarr, $dim, $pwidth, $poffset);
         $font = $this->font->getCurrentFont();
         $spacing = $font['spacing'] * $font['stretching'];
         $result = [];

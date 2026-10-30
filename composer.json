@@ -17,7 +17,7 @@
   ],
   "require": {
     "php": "^8.4",
-    "tecnickcom/tc-lib-pdf": "^8.73.6",
+    "tecnickcom/tc-lib-pdf": "^8.78.3",
     "tecnickcom/tc-lib-pdf-font": "^4.3.3"
   },
   "require-dev": {

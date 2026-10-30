@@ -1,5 +1,8 @@
 ## master
 
+ * Keep wrapping Japanese text at spaces with tc-lib-pdf 8.78.3 and later, which
+   otherwise also breaks between ideographs. Require tc-lib-pdf 8.78.3 or later.
+
  * Migrate the PDF backend directly from TCPDF 6 to tc-lib-pdf 8.
  * Bundle converted standard and IPA fonts; no runtime font conversion is needed.
  * Preserve font-size-based line heights, Japanese wrapping, and truncation without
