@@ -38,6 +38,15 @@ class BackendRenderingFeature extends FeatureTest
         $this->assertEqualsWithDelta(16, $runs[0][0][5] - $runs[1][0][5], 0.001);
     }
 
+    public function test_japaneseWrapPrefersSpacesOverIdeographicBreaks(): void
+    {
+        // tc-lib-pdf 8.78.3+ also breaks between ideographs; TCPDF wrapped at the space.
+        $doc = $this->document();
+        $doc->text->drawTextBox('あいうえお かきくけ', 20, 30, 120, 32, $this->styles());
+        $runs = $this->page($doc)->getDataTm();
+        $this->assertSame(['あいうえお', 'かきくけ'], array_map('trim', array_column($runs, 1)));
+    }
+
     #[DataProvider('spacedWrappingProvider')]
     public function test_wrappingIncludesLetterSpacing(string $overflow, float $spacing, float $width, array $expected): void
     {
