@@ -14,12 +14,84 @@ class Engine extends Tcpdf
         // Break only at spaces, as TCPDF 6 did. Unspaced text that is too long is still
         // split in splitLines(), so Japanese without spaces keeps wrapping.
         $this->enableIdeographicBreaks(false);
+        // Words wider than the line are split in splitLines() in every overflow mode.
+        $this->enableWordBreakFallback(false);
     }
 
     /** Thinreports truncates without adding an ellipsis. */
     protected function getTextCellTruncationMarkerOrdArr(): array
     {
         return [];
+    }
+
+    /**
+     * Shrink fitted text below tc-lib-pdf's 4pt minimum when needed, down to 1pt as TCPDF 6
+     * did, so long text is not truncated.
+     */
+    protected function fitTextCellByFontSize(
+        array $ordarr,
+        float $maxWidth,
+        float $maxHeight,
+        float $offsetPoints,
+        float $lineSpacePoints,
+    ): array {
+        $fit = parent::fitTextCellByFontSize($ordarr, $maxWidth, $maxHeight, $offsetPoints, $lineSpacePoints);
+        if (!$this->textCellLayoutOverflows($fit['layout'], $maxWidth, $maxHeight)) {
+            return $fit;
+        }
+        if ($fit['fontchanged']) {
+            // The caller restores one font, so drop the 4pt font before applying ours.
+            $this->font->popLastFont();
+        }
+        $current = $this->font->getCurrentFont();
+        $low = 1.0;
+        $high = min(4.0, $current['size']);
+        if ($high <= $low) {
+            return $fit;
+        }
+        $best = $this->probeTextCellFontSizeFit($ordarr, $low, $maxWidth, $maxHeight, $offsetPoints, $lineSpacePoints);
+        if ($best['fits']) {
+            for ($i = 0; $i < 12; $i++) {
+                $mid = ($low + $high) / 2;
+                $probe = $this->probeTextCellFontSizeFit($ordarr, $mid, $maxWidth, $maxHeight, $offsetPoints, $lineSpacePoints);
+                if ($probe['fits']) {
+                    $low = $mid;
+                    $best = $probe;
+                } else {
+                    $high = $mid;
+                }
+            }
+        }
+        $applied = $this->font->cloneFont($this->pon, $current['idx'], null, $best['size']);
+        if (!$best['fits']) {
+            // Even 1pt overflows: keep only the lines inside the box, as TCPDF 6 did.
+            $kept = $this->fitTextCellByTruncation($ordarr, $maxWidth, $maxHeight, $offsetPoints, $lineSpacePoints);
+            $best['dim'] = $this->font->getOrdArrDims($kept);
+            $best['layout'] = $this->getTextCellLayout(
+                $kept, $best['dim'], $maxWidth, $maxWidth, 1.0, $offsetPoints, $lineSpacePoints,
+            );
+        }
+        return ['fontchanged' => true, 'fontout' => $applied['out'], 'dim' => $best['dim'], 'layout' => $best['layout']];
+    }
+
+    /**
+     * Break lines only at ASCII white space, as TCPDF 6 did: a full-width space (U+3000)
+     * and other non-ASCII spaces stay inside the line. Paragraph breaks, soft hyphens and
+     * the end-of-text entry are kept.
+     */
+    protected function removeNoBreakSplits(array $dim): array
+    {
+        $dim = parent::removeNoBreakSplits($dim);
+        $split = array_values(array_filter(
+            $dim['split'],
+            static fn(array $data): bool => $data['septype'] === 'B' || $data['ord'] < 0x80
+                || $data['ord'] === 0xAD || $data['pos'] >= $dim['chars'],
+        ));
+        if (count($split) !== count($dim['split'])) {
+            $dim['split'] = $split;
+            $dim['words'] = count($split);
+        }
+        return $dim;
     }
 
     /** Split unspaced text (including Japanese) that exceeds the cell width. */
@@ -35,8 +107,14 @@ class Engine extends Tcpdf
                 $result[] = $line;
                 continue;
             }
-            $start = $line['pos'];
-            $end = $start + $line['chars'];
+            $end = $line['pos'] + $line['chars'];
+            // A word wider than the line follows a space: like TCPDF 6, fill the previous
+            // line instead of breaking at the space.
+            $previous = $result !== [] && end($result)['septype'] !== 'B' ? array_pop($result) : null;
+            if ($previous !== null) {
+                $available = $pwidth - ($result === [] ? $poffset : 0);
+            }
+            $first = $start = $previous['pos'] ?? $line['pos'];
             $width = 0.0;
             for ($pos = $start; $pos < $end; $pos++) {
                 $char_width = $this->font->getCharWidth($ordarr[$pos]);
@@ -50,7 +128,22 @@ class Engine extends Tcpdf
                 }
                 $width = $next_width;
             }
-            $result[] = $this->hardWrappedLine($ordarr, $start, $end - $start, $line['septype']);
+            if ($start === $first) {
+                // No break point was found, so keep the lines as they are.
+                if ($previous !== null) {
+                    $result[] = $previous;
+                }
+                $result[] = $line;
+                continue;
+            }
+            // Lay out the rest of the word again with the text after it, so the following
+            // words share its line as they did with TCPDF 6.
+            $rest = array_slice($ordarr, $start);
+            foreach ($this->splitLines($rest, $this->font->getOrdArrDims($rest), $pwidth) as $tail) {
+                $tail['pos'] += $start;
+                $result[] = $tail;
+            }
+            return $result;
         }
         return $result;
     }

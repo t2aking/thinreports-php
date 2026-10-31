@@ -47,6 +47,57 @@ class BackendRenderingFeature extends FeatureTest
         $this->assertSame(['あいうえお', 'かきくけ'], array_map('trim', array_column($runs, 1)));
     }
 
+    #[DataProvider('overflowProvider')]
+    public function test_crlfIsASingleLineBreak(string $overflow): void
+    {
+        // TCPDF 6 removed every CR, so CRLF from form input was one break. A wrapped
+        // paragraph followed by CRLF must not get an empty line.
+        $doc = $this->document();
+        $doc->text->drawTextBox("あいうえおかきくけ。\r\nさし\rすせ", 20, 30, 80, 100,
+            $this->styles(['overflow' => $overflow]));
+        $runs = $this->page($doc)->getDataTm();
+        $this->assertSame(['あいうえお', 'かきくけ。', 'さしすせ'], array_map('trim', array_column($runs, 1)));
+        foreach ([1, 2] as $i) {
+            $this->assertEqualsWithDelta(16, $runs[$i - 1][0][5] - $runs[$i][0][5], 0.001);
+        }
+    }
+
+    #[DataProvider('overflowProvider')]
+    public function test_wrappedWordRemainderSharesLineWithNextWord(string $overflow): void
+    {
+        $doc = $this->document();
+        $doc->text->drawTextBox('あいうえおかき さし', 20, 30, 80, 100, $this->styles(['overflow' => $overflow]));
+        $runs = $this->page($doc)->getDataTm();
+        $this->assertSame(['あいうえお', 'かき さし'], array_map('trim', array_column($runs, 1)));
+    }
+
+    #[DataProvider('overflowProvider')]
+    public function test_spaceBeforeWordLongerThanLineDoesNotBreak(string $overflow): void
+    {
+        // TCPDF 6 broke at a space only when the next word fits a line; otherwise it
+        // filled the line, as for "8/7 <long Japanese sentence>".
+        $doc = $this->document();
+        $doc->text->drawTextBox('あい うえおかきくけこさしす', 20, 30, 80, 100, $this->styles(['overflow' => $overflow]));
+        $runs = $this->page($doc)->getDataTm();
+        $this->assertSame(['あい うえ', 'おかきくけ', 'こさしす'], array_map('trim', array_column($runs, 1)));
+    }
+
+    #[DataProvider('overflowProvider')]
+    public function test_ideographicSpaceIsNotABreakPoint(string $overflow): void
+    {
+        // TCPDF 6 broke only at ASCII white space, so a full-width space (U+3000) used as
+        // a separator or for indentation stayed inside the line.
+        $doc = $this->document();
+        $doc->text->drawTextBox("あい\u{3000}うえお", 20, 30, 80, 100, $this->styles(['overflow' => $overflow]));
+        $runs = $this->page($doc)->getDataTm();
+        $this->assertSame(["あい\u{3000}うえ", 'お'], array_map('trim', array_column($runs, 1)));
+    }
+
+    public static function overflowProvider(): array
+    {
+        return ['truncate' => ['truncate'], 'fit' => ['fit'], 'expand' => ['expand']];
+    }
+
     #[DataProvider('spacedWrappingProvider')]
     public function test_wrappingIncludesLetterSpacing(string $overflow, float $spacing, float $width, array $expected): void
     {
@@ -149,6 +200,42 @@ class BackendRenderingFeature extends FeatureTest
         $runs = $pdf->getPages()[0]->getDataTm();
         $this->assertCount(3, $runs);
         $this->assertSame('さしすせそ', $runs[2][1]);
+    }
+
+    public function test_fitShrinksBelowFourPointsToKeepAllText(): void
+    {
+        // TCPDF 6 shrank fitted text down to 1pt; tc-lib-pdf stops at 4pt and truncates.
+        $doc = $this->document();
+        $text = str_repeat('あいうえおかきくけこ', 6);
+        $doc->text->drawTextBox($text, 20, 30, 40, 20, $this->styles(['overflow' => 'fit']));
+        $doc->text->drawTextBox('あいうえお', 20, 100, 80, 16, $this->styles());
+        $page = $this->page($doc);
+        $runs = $page->getDataTm();
+        $last = array_pop($runs);
+        $this->assertSame($text, implode('', array_column($runs, 1)));
+        $this->assertSame('あいうえお', $last[1]);
+        preg_match_all('/\/F\d+ ([0-9.]+) Tf/', $page->get('Contents')->getContent(), $sizes);
+        $this->assertLessThan(4, min(array_map('floatval', $sizes[1])));
+        $this->assertEqualsWithDelta(16, (float) end($sizes[1]), 0.001);
+    }
+
+    public function test_fitTruncatesTextThatDoesNotFitAtOnePoint(): void
+    {
+        // Like TCPDF 6, text that does not fit even at 1pt is cut at the bottom of the box
+        // instead of running into the items below it.
+        $doc = $this->document();
+        $text = str_repeat('あいうえおかきくけこ', 200);
+        $doc->text->drawTextBox($text, 20, 30, 40, 10, $this->styles(['overflow' => 'fit']));
+        $page = $this->page($doc);
+        $runs = $page->getDataTm();
+        $drawn = implode('', array_column($runs, 1));
+        $this->assertNotSame('', $drawn);
+        $this->assertStringStartsWith($drawn, $text);
+        $this->assertLessThan(mb_strlen($text), mb_strlen($drawn));
+        $pageHeight = (float) $page->get('MediaBox')->getContent()[3]->getContent();
+        foreach ($runs as $run) {
+            $this->assertGreaterThanOrEqual($pageHeight - 40 - 0.001, (float) $run[0][5]);
+        }
     }
 
     public function test_fitRetainsTextAndRestoresFontSizeForNextBox(): void
