@@ -86,8 +86,9 @@ class Text
         $emulating = $this->startStyleEmulation($attrs['font_family'], $attrs['font_style'], $styles['color']);
         $fit = $styles['overflow']['fit_cell'] ? 'F'
             : ($styles['overflow']['max_height'] > 0 ? 'T' : '');
+        // TCPDF 6 removed every CR, so CRLF is a single line break.
         $content = $this->pdf->getTextCell(
-            txt: $content, posx: (float) $x, posy: (float) $y,
+            txt: str_replace("\r", '', $content), posx: (float) $x, posy: (float) $y,
             width: (float) $width, height: (float) $height,
             linespace: (float) $styles['font_size'] * (float) $styles['line_height'] - $font['height'],
             valign: $fit === '' ? 'T' : ($styles['valign'] === 'M' ? 'C' : $styles['valign']),

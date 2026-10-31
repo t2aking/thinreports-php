@@ -1,5 +1,12 @@
 ## master
 
+ * Match TCPDF 6 line breaking and fitting, found by comparing production reports:
+   remove CR so CRLF is one line break; break only at ASCII white space, not at
+   full-width spaces; fill the line instead of breaking at a space before a word longer
+   than the line; keep the rest of a split word on the line with the following words;
+   shrink fitted text down to 1pt and cut it at the bottom of the box when even 1pt
+   does not fit. Require tc-lib-pdf 8.79.1 or later.
+
  * Speed up reports with large opaque background images and reduce memory use with
    Japanese fonts. A downsampled opaque PNG is resized once with GD and embedded
    without the fully opaque soft mask tc-lib-pdf added; its pixels are unchanged.
